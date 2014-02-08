@@ -18,15 +18,9 @@ class conf():
     M_IP=''
     MIPP=''
     DOMAIN=''
-    USER=''
-    PASSWD=''
+    USER='admin@internal'
+    PASSWD='zj@Cloud)(12'
 
-    FULL_SCREEN=True
-    CONFIG_FILE='conf_vm_console.ini'
-    CERTS_DIR='.certs/'
-    PERM_PATH=' ~/.spicec/spice_truststore.pem'
-
-    CONSOLE='spicy'
 
 
 
@@ -89,28 +83,17 @@ def do_SSH(HIP,cmd='hostname',user='root',password='redhat'):
 def kill_vm_by_name(hip,vmname):
     CMD=r"vdsClient -s 0 list table |grep "+vmname+r' |awk \"{print \\\$2}\" |xargs kill -9 '
     rt=do_SSH(hip,CMD)
+    return '222'
 #    print rt
 
 
-
-
-def get_domain(Mipp):
-#    pass
-    uri=Mipp+r'/api/domains'
-    rt_xml=rest_request(uri,'GET')
-    doc=etree.fromstring(rt_xml)
-    domains=doc.findall('domain')
-    for domain in domains:
-        dn=domain.find('name').text
-        if dn=='internal':
-            continue
-        return dn
 
 
 
 def get_vm_info(Mipp,vmname):
 #    print_warn(Mipp+' '+vmname)
     rt_xml=get_vms_by_name_xml(Mipp,vmname)
+#    print rt_xml
     if rt_xml is None:
         print "NoneXML"
         return None
@@ -119,7 +102,8 @@ def get_vm_info(Mipp,vmname):
 
     vm_info_d={}
     res=Mipp+'/api/vms/'+vmid
-    rt_xml=rest_request(res,'GET')
+    st,rt_xml=rest_request(res,'GET')
+    sys.stderr.write(st)
 #   print_info(rt_xml)
     vmnode=etree.fromstring(rt_xml)
 #   vmnode=doc.find('vm')
@@ -167,62 +151,17 @@ def get_vm_info(Mipp,vmname):
 
 
 
-def viewer_open(Mip,vmname,C,user=gc.USER,passwd=gc.PASSWD,options=None):
-
-#    f4=Mhm2Mip(M)
-#    Mipp=gen_ip(f4)
-    Mipp=gc.URL_PROTO+Mip+gc.URL_PORT
-    cert_file=get_ca_crt(Mipp)
-    vm_info_d=get_vm_info(Mipp,vmname)
-    vmid=vm_info_d['id']
-    host=vm_info_d['host']
-    port=vm_info_d['port']
-    sport=vm_info_d['sport']
-    host_cert_subject=vm_info_d['host_cert_subject']
-
-    print_warn("::"+user+" :: "+passwd)
-    #ticket_d=vm_set_ticket(Mipp,vmid)
-    ticket_d=vm_set_ticket(Mipp,vmid,user,passwd)
-
-    if ticket_d['state']!='complete':
-        print_err("Set Ticket for VM: "+vmname)
-        sys.exit(-1)
-    #fi
-    passwd=ticket_d['ticket_value']
-
-    if C=='remote-viewer':
-	CMD='''remote-viewer --spice-ca-file=%(cert_file)s --spice-host-subject '%(subject)s' spice://%(host)s/?port=%(port)s\&tls-port=%(sport)s\&password=%(passwd)s '''%{'cert_file':cert_file,'subject':host_cert_subject,'host':host,'port':port,'sport':sport,'passwd':passwd}
-    elif C=='spicy':
-	CMD='''spicy -h %(host)s -s %(sport)s  -w %(passwd)s '''%{'host':host,'sport':sport,'passwd':passwd}
-    else:
-        CMD='echo WRONG VIEWER!!'
-    #fi
-    if conf.FULL_SCREEN:
-        CMD=CMD+" "+"-f "
-    #fi
-    if not options is None:
-        CMD=CMD+" "+options
-    #fi
-    print_ok(CMD)
-    rv=os.system(CMD)
-
-
 def usage():
     message='''
 
 Usage %s [OPTION.] VM
         -m | --m-plat M       \t: Set the Rhevm name.
         -l | --address ip     \t: ip of RhevM.
-        -u | --usr loginname  \t: User name for Login.
-        -p | --password PASSWD\t: Password with user.
 
-        -d | --get-domain     \t: get domain.
-        -s | --get-vm-state   \t: get vm's status.
         --up                  \t: power on VM.
         --down                \t: shutdown VM.
         --kill                \t: force kill VM.
 
-        -f | --full           \t: Open Console full screen.
         -h | --help           \t: Print this Message.
 
 for Rhevm 3.1 or Ovirt 3.1
@@ -235,17 +174,11 @@ for Rhevm 3.1 or Ovirt 3.1
 
 def main():
     try:
-        opts,args=getopt.getopt(sys.argv[1:],'UDKsm:l:fhc:SRu:p:d',['get-vm-state','get-domain','m-plat=','address=','full','help','console=','spicy','remote-viewer','user=','password=','up','down','kill'])
+        opts,args=getopt.getopt(sys.argv[1:],'UDKm:l:h',['m-plat=','address=','help','up','down','kill'])
     except getopt.GetoptError as err:
         print_err(err)
         usage()
     #yrt
-#    if not os.path.exists(conf.CONFIG_FILE):
-#        gen_conf(conf.CONFIG_FILE)
-#        sys.exit(0)
-#    else:
-#        read_conf(conf.CONFIG_FILE,conf)
-#    #fi
     VMs=args[:]
     if len(VMs)==0:
         print_info("No VM was given..")
@@ -266,38 +199,24 @@ def main():
         elif o in ('-l','--address'):
             conf.M_IP=a
             conf.MIPP=gc.URL_PROTO+conf.M_IP+gc.URL_PORT
-        elif o in ('-d','--get-domain'):
-            print get_domain(conf.MIPP)
-#            time.sleep(2)
-#            print "ccloud.net"
-            sys.exit(0)
-        elif o in ('-s','--get-vm-state'):
-            print get_vm_info(conf.MIPP,VM)['state']
-            sys.exit(0)
         elif o in ('-U','--up'):
             vmid=get_vm_info(conf.MIPP,VM)['id']
-            vm_start(conf.MIPP,vmid)
+            st=vm_start(conf.MIPP,vmid)
+            if st[0]=='2':
+                sys.stderr.write("OPER-OK")
             sys.exit(0)
         elif o in ('-D','--down'):
             vmid=get_vm_info(conf.MIPP,VM)['id']
-            vm_shutdown(conf.MIPP,vmid)
+            st=vm_shutdown(conf.MIPP,vmid)
+            if st[0]=='2':
+                sys.stderr.write("OPER-OK")
             sys.exit(0)
         elif o in ('-K','--kill'):
             hip=get_vm_info(conf.MIPP,VM)['host']
-            kill_vm_by_name(hip,VM)
+            st=kill_vm_by_name(hip,VM)
+            if st[0]=='2':
+                sys.stderr.write("OPER-OK")
             sys.exit(0)
-        elif o in ('-u','--user'):
-            conf.USER=a
-        elif o in ('-p','--password'):
-            conf.PASSWD=a
-        elif o in ('-f','--full'):
-            conf.FULL_SCREEN=True
-        elif o in ('-c','--console'):
-            conf.CONSOLE=a
-        elif o in ('-S','--spicy'):
-            conf.CONSOLE='spicy'
-        elif o in ('-R','--remote-viewer'):
-            conf.CONSOLE='remote-viewer'
         elif o in ('-h','--help'):
             usage()
             sys.exit(0)
@@ -307,10 +226,7 @@ def main():
 	#fi
     #rof
 
-#    print_ok(gc.USER)
-#    print_ok(gc.PASSWD)
 
-    viewer_open(conf.M_IP,VM,user=conf.USER,passwd=conf.PASSWD,C=conf.CONSOLE)
 
 
 

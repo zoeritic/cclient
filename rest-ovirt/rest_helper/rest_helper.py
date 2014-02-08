@@ -147,19 +147,22 @@ def rest_request(link,method='GET',body=None,user=gc.USER,passwd=gc.PASSWD):
     Headers={'content-type':'application/xml','accept':'application/xml'}
     Method=method.upper()
     resp,content=h.request(link,method=Method,headers=Headers,body=body)
-#    print resp['status']
-    ss=resp['status']
-    if ss[0]=='2':
-#        print_ok(resp)
-        print "STATUS:%s"%resp['status']
-        return content
-    else:
-        print "STATUS:%s"%ss
-#        if ss=='400':
-#            sys.stdout.write("400")
-        sys.stderr.write("ERROR::STATUS")
-#        print_info(content)
-        return None
+    return resp['status'],content
+
+##    print resp['status']
+#    ss=resp['status']
+#    print "STATUS:%s"%ss
+#    if ss[0]=='2':
+##        print_ok(resp)
+##        print "STATUS:%s"%resp['status']
+#        return content
+#    else:
+##        print "STATUS:%s"%ss
+##        if ss=='400':
+##            sys.stdout.write("400")
+##        sys.stderr.write(ss)
+##        print_info(content)
+#        return None
 
 def gen_link(m,sources):
     link=gc.URL_PROTO+gc.URL_PRE+m+gc.URL_PORT+source
@@ -220,19 +223,19 @@ def gen_curl_delete(IP,resource,desc):
 
 def list_all_vms_xml(Mipp,max=1000):
     link=Mipp+r'/api/vms;max='+str(max)
-    cnt_xml=rest_request(link,'GET')
+    st,cnt_xml=rest_request(link,'GET')
     return cnt_xml
 
 def list_all_hosts_xml(Mipp,max=100):
     link=Mipp+r'/api/hosts;max='+str(max)
-    cnt_xml=rest_request(link,'GET')
+    st,cnt_xml=rest_request(link,'GET')
     return cnt_xml
 #-------------------
 
 
 def list_all_storagedomains_xml(Mipp,max=100):
     link=Mipp+r'/api/storagedomains;max='+str(max)
-    cnt_xml=rest_request(link,'GET')
+    st,cnt_xml=rest_request(link,'GET')
 #    print cnt_xml
     return cnt_xml
 
@@ -240,13 +243,13 @@ def list_all_storagedomains_xml(Mipp,max=100):
 
 def list_all_users_xml(Mipp,max=1000):
     link=Mipp+r'/api/users;max='+str(max)
-    cnt_xml=rest_request(link,'GET')
+    st,cnt_xml=rest_request(link,'GET')
     return cnt_xml
 
 def get_vms_by_name_xml(Mipp,vmname):
     link=Mipp+r'/api/vms?search=name%3D'+vmname
 #    print_err(link)
-    cnt_xml=rest_request(link,'GET')
+    st,cnt_xml=rest_request(link,'GET')
     return cnt_xml
 
 def get_host_of_vms(xml):
@@ -267,12 +270,12 @@ def get_host_of_vms(xml):
 
 def get_hosts_by_name_xml(Mipp,hostname):
     link=Mipp+r'/api/hosts?search=name%3D'+hostname
-    cnt_xml=rest_request(link,'GET')
+    st,cnt_xml=rest_request(link,'GET')
     return cnt_xml
 
 def get_users_by_name_xml(Mipp,name):#not username:user1@domain ;
     link=Mipp+r'/api/users?search=name%3D'+name
-    cnt_xml=rest_request(link,'GET')
+    st,cnt_xml=rest_request(link,'GET')
     return cnt_xml
 
 #-----------------------------------------------------------
@@ -334,7 +337,7 @@ def get_href_by_state(xml,node='vm',state='UP'): #xml  /api/vms or /api/hosts
 
 def get_name_from_id(Mipp,id_,nodes='vms'):
     resource=r'/api/'+nodes+r'/'+id_
-    rt_xml=rest_request(Mipp+resource,'GET')
+    st,rt_xml=rest_request(Mipp+resource,'GET')
     if rt_xml is None:
         print_err('Can not GET name from id:['+id_+']')
         return ''
@@ -442,14 +445,14 @@ def set_usb(Mipp,vmid,type='native'):
         put_desc=r'<vm><usb><enabled>true</enabled><type>'+type+r'</type></usb></vm>'
     #fi
     resource='/api/vms/'+vmid
-    rt_xml=rest_request(Mipp+resource,'PUT',put_desc)
+    st,rt_xml=rest_request(Mipp+resource,'PUT',put_desc)
     return check_rt_xml(rt_xml,'Set USB of VM',Mipp,vmid)
 
 
 def allow_override(Mipp,vmid,disable='true',monitors=1,dtype='spice'):
     put_desc=r'<vm><display><type>'+dtype+r'</type><monitors>'+str(monitors)+r'</monitors><allow_override>'+disable+r'</allow_override></display></vm>'
     resource='/api/vms/'+vmid
-    rt_xml=rest_request(Mipp+resource,'PUT',put_desc)
+    st,rt_xml=rest_request(Mipp+resource,'PUT',put_desc)
     if disable=='true':
         prestat='Able'
     else:
@@ -464,7 +467,7 @@ def add_user(Mipp,name):
 #    curl_cmd=gen_curl_post(Mipp,'/api/users',post_desc)
 #    rt_xml=exec_curl(curl_cmd)
 #----
-    rt_xml=rest_request(Mipp+'/api/users','POST',post_desc)
+    st,rt_xml=rest_request(Mipp+'/api/users','POST',post_desc)
 #----
     if rt_xml is None:
         print_err("Add_User["+name+"] --> Skipped")
@@ -482,19 +485,18 @@ def add_user(Mipp,name):
 def vm_set_ticket(Mipp,vmid,user,passwd,expiry='120'):
     res=Mipp+r'/api/vms/'+vmid+r'/ticket'
     post_desc='<action><ticket><expiry>'+expiry+r'</expiry></ticket></action>'
-    rt_xml=rest_request(res,'POST',post_desc,user,passwd)
-#    print "--------------------"
-#    print rt_xml
-#    print "--------------------"
+    st,rt_xml=rest_request(res,'POST',post_desc,user,passwd)
+    print "--------------------"
+    print rt_xml
+    print "--------------------"
     try:
         rdoc=etree.fromstring(rt_xml)
     except Exception as e:
 #        print_info("Parser xml error:: Set ticket ERROR")
 #        print_err("XXXX")
-        return None
+        return st,None
 #        print e
     #yrt
-#    print_err("====")
     state=rdoc.find('status').find('state').text
     ticket_value=rdoc.find('ticket').find('value').text
     ticket_expiry=rdoc.find('ticket').find('expiry').text
@@ -502,7 +504,7 @@ def vm_set_ticket(Mipp,vmid,user,passwd,expiry='120'):
     ticket_d['state']=state
     ticket_d['ticket_value']=ticket_value
     ticket_d['ticket_expiry']=ticket_expiry
-    return ticket_d
+    return st,ticket_d
 
 
 def get_vm_permissions(Mipp,vmid):
@@ -540,7 +542,7 @@ def vm_give_permission(Mipp,vmid,name):
 #    curl_cmd=gen_curl_post(Mipp,resource,post_desc)
 #    rt_xml=exec_curl(curl_cmd)
 #----
-    rt_xml=rest_request(Mipp+resource,'POST',post_desc)
+    st,rt_xml=rest_request(Mipp+resource,'POST',post_desc)
 #----
     if rt_xml is None:
         vmnm=get_name_from_id(Mipp,vmid,'vms')
@@ -562,7 +564,7 @@ def vm_remove_permissions(Mipp,vmid):
 #        print id
 #        print perm_d[id]
         resource='/api/vms/'+vmid+'/permissions/'+perm_d[id][0]
-        rt_xml=rest_request(Mipp+resource,'DELETE')
+        st,rt_xml=rest_request(Mipp+resource,'DELETE')
     vmnm=get_name_from_id(Mipp,vmid,'vms')
 #    nperm_d=get_vm_permissions(Mipp,vmid)
 #    print_info(nperm_d)
@@ -574,7 +576,7 @@ def vm_remove_permissions(Mipp,vmid):
 
 def get_vm_nics(Mipp,vmid):
     res=Mipp+r'/api/vms/'+vmid+'/nics'
-    rt_xml=rest_request(res,'GET')
+    st,rt_xml=rest_request(res,'GET')
 #    print rt_xml
     doc=etree.fromstring(rt_xml)
     niclist=doc.findall('nic')
@@ -595,7 +597,7 @@ def vm_set_memory(Mipp,vmid,memsize='1610612736'):
     put_desc=r'<vm><memory>'+memsize+r'</memory></vm>'
     resource='/api/vms/'+vmid
 
-    rt_xml=rest_request(Mipp+resource,'PUT',put_desc)
+    st,rt_xml=rest_request(Mipp+resource,'PUT',put_desc)
     return check_rt_xml(rt_xml,'Modify Memory for VM',Mipp,vmid)
 
 
@@ -608,7 +610,7 @@ def vm_add_nic(Mipp,vmid,vlan_name,nic_name='nic1',nic_type='rtl8139'):
 #    rt_xml=exec_curl(curl_cmd)
 #----
     print_warn(Mipp+resource)
-    rt_xml=rest_request(Mipp+resource,'POST',post_desc)
+    st,rt_xml=rest_request(Mipp+resource,'POST',post_desc)
 #----
     return check_rt_xml(rt_xml,'Add Nic to VM',Mipp,vmid)
 
@@ -620,7 +622,7 @@ def vm_modify_nic(Mipp,vmid,nicid,vlan_name,nic_name='nic1',nic_type='rtl8139'):
 #    curl_cmd=gen_curl_put(Mipp,resource,put_desc)
 #    rt_xml=exec_curl(curl_cmd)
 #----
-    rt_xml=rest_request(Mipp+resource,'PUT',put_desc)
+    st,rt_xml=rest_request(Mipp+resource,'PUT',put_desc)
     return check_rt_xml(rt_xml,'Modify Nic of VM',Mipp,vmid)
 
 
@@ -647,7 +649,8 @@ def vm_start(Mipp,vmid,boot='hd',cdrom='',user='admin@internal',passwd='zj@Cloud
         post_desc=r'<action><vm><os><boot dev="'+boot+r'"/></os><cdroms><cdrom><file id="'+cdrom+r'"/></cdrom></cdroms></vm></action>'
 
     resource=r'/api/vms/'+vmid+r'/start'
-    rt_xml=rest_request(Mipp+resource,'POST',post_desc,user=user,passwd=passwd)
+    st,rt_xml=rest_request(Mipp+resource,'POST',post_desc,user=user,passwd=passwd)
+    return st
 ##    return check_rt_xml(rt_xml,'Start VM',Mipp,vmid)
 
 
@@ -655,14 +658,16 @@ def vm_start(Mipp,vmid,boot='hd',cdrom='',user='admin@internal',passwd='zj@Cloud
 def vm_stop(Mipp,vmid,user='admin@internal',passwd='zj@Cloud)(12'):
     post_desc='<action/>'
     resource=r'/api/vms/'+vmid+r'/stop'
-    rt_xml=rest_request(Mipp+resource,'POST',post_desc,user=user,passwd=passwd)
+    st,rt_xml=rest_request(Mipp+resource,'POST',post_desc,user=user,passwd=passwd)
+    return st
 ##    return check_rt_xml(rt_xml,'Stop VM',Mipp,vmid)
 
 
 def vm_shutdown(Mipp,vmid):
     post_desc='<action/>'
     resource=r'/api/vms/'+vmid+r'/shutdown'
-    rt_xml=rest_request(Mipp+resource,'POST',post_desc)
+    st,rt_xml=rest_request(Mipp+resource,'POST',post_desc)
+    return st
 ##    return check_rt_xml(rt_xml,'Shutdown VM',Mipp,vmid)
 
 
@@ -677,13 +682,13 @@ def vm_migrate(Mipp,vmid,host=None,force=False):
         post_desc='<action><host><name>'+hostname+r'</name></host></action>'
 
     resource=r'/api/vms/'+vmid+r'/migrate'
-    rt_xml=rest_request(Mipp+resource,'POST',post_desc)
+    st,rt_xml=rest_request(Mipp+resource,'POST',post_desc)
     return check_rt_xml(rt_xml,'Migrate VM Operation',Mipp,vmid)
 
 def vm_cancel_migrate(Mipp,vmid):
     post_desc='<action/>'
     resource=r'/api/vms/'+vmid+r'/cancelmigration'
-    rt_xml=rest_request(Mipp+resource,'POST',post_desc)
+    st,rt_xml=rest_request(Mipp+resource,'POST',post_desc)
     return check_rt_xml(rt_xml,'Cancel Migration VM Operation',Mipp,vmid)
 
 
@@ -693,7 +698,7 @@ def export_vm(Mipp,vmid,export='EXPORT',exclusive=True,discard_snapshots=True):
 
     post_desc='<action><storage_domain><name>'+export+'</name></storage_domain><exclusive>true</exclusive><discard_snapshots>true</discard_snapshots></action>'
     resource=r'/api/vms/'+vmid+r'/export'
-    rt_xml=rest_request(Mipp+resource,'POST',post_desc)
+    st,rt_xml=rest_request(Mipp+resource,'POST',post_desc)
     return check_rt_xml(rt_xml,'Export VM',Mipp,vmid)
 
 
@@ -743,7 +748,7 @@ def vm_create(Mipp,vmname,template='Blank',cluster='Default',vlan='',clone='fals
     #fi
 
 
-    rt_xml=rest_request(Mipp+r'/api/vms',"POST",post_desc)
+    st,rt_xml=rest_request(Mipp+r'/api/vms',"POST",post_desc)
 
 #    rt_create=check_rt_xml(rt_xml,'Create VM',Mipp)
     if not rt_xml:
@@ -769,13 +774,13 @@ def vm_create(Mipp,vmname,template='Blank',cluster='Default',vlan='',clone='fals
 def vm_remove(Mipp,vmid):
     del_desc='<action><force>true</force></action>'
     resource=r'/api/vms/'+vmid
-    rt_xml=rest_request(Mipp+resource,'DELETE',del_desc)
+    st,rt_xml=rest_request(Mipp+resource,'DELETE',del_desc)
     return check_rt_xml(rt_xml,'Remove VM',Mipp,vmid)
 
 
 
 def template_get_disks(Mipp,tmpid):
-    rt_xml=rest_request(Mipp+r'/api/templates/'+tmpid+r'/disks','GET')
+    st,rt_xml=rest_request(Mipp+r'/api/templates/'+tmpid+r'/disks','GET')
     check_rt_xml(rt_xml,'Get Disks of TMP',Mipp,tmpid,'templates')
     doc=etree.fromstring(rt_xml)
     disk_list=doc.findall('disk')
@@ -790,7 +795,7 @@ def template_cp_disk(Mipp,tmpid,storagedomainname):
     diskids=template_get_disks(Mipp,tmpid)
     for did in diskids:
         post_desc=r'<action><storage_domain><name>'+storagedomainname+r'</name></storage_domain></action>'
-        rt_xml=rest_request(Mipp+r'/api/templates/'+tmpid+r'/disks/'+did+r'/copy','POST',post_desc)
+        st,rt_xml=rest_request(Mipp+r'/api/templates/'+tmpid+r'/disks/'+did+r'/copy','POST',post_desc)
         if rt_xml is None:
             print_err('Copying Disk')
 
@@ -800,7 +805,7 @@ def template_cp_disk(Mipp,tmpid,storagedomainname):
 
 
 def get_template_info(Mipp,template):
-    rt_xml=rest_request(Mipp+r'/api/templates','GET')
+    st,rt_xml=rest_request(Mipp+r'/api/templates','GET')
     tdoc=etree.fromstring(rt_xml)
     temp_list=tdoc.findall('template')
     tmpinfo_d={}
@@ -873,7 +878,7 @@ def get_template_info(Mipp,template):
 def get_vm_link_of(Mipp,vmid,link='statistics'):# /api/vms/VMID
     resource=r'/api/vms/'+vmid+'/'+link
 #    print_info("Resource: "+resource)
-    rt_xml=rest_request(Mipp+resource,'GET')
+    st,rt_xml=rest_request(Mipp+resource,'GET')
     if rt_xml is None:
         vmname=get_name_from_id(Mipp,vmid)
         print_err('Get '+link+' of VM: '+vmname+' Failed')

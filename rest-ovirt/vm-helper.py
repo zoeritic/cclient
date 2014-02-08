@@ -97,30 +97,13 @@ def kill_vm_by_name(hip,vmname):
 
 
 
-def user_auth(Mipp,user,passwd):
-#    print_info("USER:"+user+" PASSWD:"+passwd)
-    print_info("MIPP:"+Mipp)
-    h=httplib2.Http(disable_ssl_certificate_validation=True)
-    h.add_credentials(user,passwd)
-    Headers={'content-type':'application/xml','accept':'application/xml'}
-    link=Mipp+'/api/vms'
-    resp,content=h.request(link,method='GET',headers=Headers,body=None)
-    rss=resp['status']
-
-    if rss=='400':
-        print "Authorized OK!"
-    else:
-        print "Authorized Failed!"
-        sys.stderr.write("Authorized:User Password\n")
-
-#    rt_xml=rest_request(Mipp+'/api/vms','GET',user=user,passwd=passwd)
 
 
 
 def get_domain(Mipp):
 #    pass
     uri=Mipp+r'/api/domains'
-    rt_xml=rest_request(uri,'GET')
+    st,rt_xml=rest_request(uri,'GET')
     doc=etree.fromstring(rt_xml)
     domains=doc.findall('domain')
     for domain in domains:
@@ -135,6 +118,7 @@ def get_vm_info(Mipp,vmname):
 #    print_warn(Mipp+' '+vmname)
 #    print_info("USER:"+conf.USER+"PASSWD:"+conf.PASSWD)
     rt_xml=get_vms_by_name_xml(Mipp,vmname)
+#    print rt_xml
     doc=etree.fromstring(rt_xml)
 
     n_vm=len(doc.findall('vm'))
@@ -146,8 +130,9 @@ def get_vm_info(Mipp,vmname):
 
     vm_info_d={}
     res=Mipp+'/api/vms/'+vmid
-    rt_xml=rest_request(res,'GET',user=conf.USER,passwd=conf.PASSWD)
-#   print_info(rt_xml)
+    st,rt_xml=rest_request(res,'GET',user=conf.USER,passwd=conf.PASSWD)
+#    print st
+    print_info(rt_xml)
     vmnode=etree.fromstring(rt_xml)
 #   vmnode=doc.find('vm')
 #    print_info(vmnode)

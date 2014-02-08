@@ -128,11 +128,11 @@ static void cc_loging_win_set_property(GObject * object,
 static gboolean cc_loging_authorize(CCLogingWin *win)
 {
 
-    gchar* cmd=g_strdup_printf("./rest-ovirt/vm-helper.py -l %s -u %s@%s -p %s -A %s",
+    gboolean rtval=FALSE;
+    gchar* cmd=g_strdup_printf("./rest-ovirt/vm-auth.py %s %s %s",
             glink->addr,
-            win->info->user,win->info->domain,
-            win->info->passwd,
-            win->info->user);
+            win->info->user,
+            win->info->passwd);
     gchar*out,*err;
 //    gint status;
     GError*e=NULL;//g_error_new();
@@ -150,10 +150,11 @@ static gboolean cc_loging_authorize(CCLogingWin *win)
     g_print("OUT::%s:: \tERR::%s::\n",out,err);
 //    g_free(out);
 //    g_free(err);
-    
+    if(NULL!=strstr(out,"AUTH-OK"))
+        rtval=TRUE;
     g_error_free(e);
     g_free(cmd);
-    return TRUE;
+    return rtval;
     } 
 }
 

@@ -148,15 +148,16 @@ def rest_request(link,method='GET',body=None,user=gc.USER,passwd=gc.PASSWD):
     Method=method.upper()
     resp,content=h.request(link,method=Method,headers=Headers,body=body)
 #    print resp['status']
-    if resp['status'][0]=='2':
+    ss=resp['status']
+    if ss[0]=='2':
 #        print_ok(resp)
+        print "STATUS:%s"%resp['status']
         return content
     else:
-        ss=resp['status']
         print "STATUS:%s"%ss
 #        if ss=='400':
 #            sys.stdout.write("400")
-        sys.stderr.write("ERROR:STATUS")
+        sys.stderr.write("ERROR::STATUS")
 #        print_info(content)
         return None
 
@@ -482,7 +483,18 @@ def vm_set_ticket(Mipp,vmid,user,passwd,expiry='120'):
     res=Mipp+r'/api/vms/'+vmid+r'/ticket'
     post_desc='<action><ticket><expiry>'+expiry+r'</expiry></ticket></action>'
     rt_xml=rest_request(res,'POST',post_desc,user,passwd)
-    rdoc=etree.fromstring(rt_xml)
+#    print "--------------------"
+#    print rt_xml
+#    print "--------------------"
+    try:
+        rdoc=etree.fromstring(rt_xml)
+    except Exception as e:
+#        print_info("Parser xml error:: Set ticket ERROR")
+#        print_err("XXXX")
+        return None
+#        print e
+    #yrt
+#    print_err("====")
     state=rdoc.find('status').find('state').text
     ticket_value=rdoc.find('ticket').find('value').text
     ticket_expiry=rdoc.find('ticket').find('expiry').text

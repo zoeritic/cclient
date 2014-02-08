@@ -2,8 +2,8 @@
 
 curl -X POST -H "Accept:application/xml" \
     -H "Content-Type:application/xml" -k\
-    -u 't11@zjcloud.net':'12345678'\
-    -d "<action><vm><os><boot dev=\"cdrom\"/></os></vm></action>"\
-    https://10.11.4.184:8443/api/vms/94c4f1c0-180d-4261-8b85-e2b4498acbf0/start
+    -u 'DBHZX501@zjcloud.net':'12345678'\
+    -d "<action><ticket><expiry>120</expiry></ticket></action>"\
+    https://10.11.4.173:8443/api/vms/e758eb61-fda3-40fb-9599-9f991601838c/ticket
 
 #    -u 'admin@internal':'zj@Cloud)(12'\

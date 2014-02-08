@@ -128,7 +128,7 @@ static void cc_loging_win_set_property(GObject * object,
 static gboolean cc_loging_authorize(CCLogingWin *win)
 {
 
-    gchar* cmd=g_strdup_printf("/root/devel/cc/rest-ovirt/vm-helper.py -l %s -u %s@%s -p %s -A %s",
+    gchar* cmd=g_strdup_printf("./rest-ovirt/vm-helper.py -l %s -u %s@%s -p %s -A %s",
             glink->addr,
             win->info->user,win->info->domain,
             win->info->passwd,

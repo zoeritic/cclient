@@ -667,7 +667,7 @@ static void cc_loging_win_init(CCLogingWin * self)
 //    cc_loging_info_print(&self->info);
 //
     self->info = cc_loging_info_new();
-    g_print("cc-loging-win:initialized\n");
+    g_print("cc-loging-win:init\n");
 }
 
 void cc_loging_win_initialize(CCLogingWin * self)

@@ -1,6 +1,4 @@
 #include"cc-manager-applet.h"
-//#include"cc-manager-panel.h"
-//#include"cc-loging-win.h"
 #include"cc-link-info.h"
 
 CCLinkInfo*glink=NULL;
@@ -317,7 +315,7 @@ gboolean cc_manager_applet_setup_widget(CCManagerApplet * applet)
 
 //setting CCLogingWin
     applet->loging_win = cc_loging_win_new();
-//    g_message("dddddddddddddddddddddddddddddd");
+    g_message("dddddddddddddddddddddddddddddd");
     cc_loging_win_initialize(applet->loging_win);
     cc_loging_win_setup(applet->loging_win);
     g_message("win setuped in cc_manager_applet_setup_widget");

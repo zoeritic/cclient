@@ -97,6 +97,7 @@ void cc_loging_info_read_file(CCLogingInfo * info, gchar * filename)
     info->sav_passwd =g_key_file_get_boolean(confile, "LOGING", "SAV_PASSWD", NULL);
 
     g_message("cc_loging_info_read_from_file...");
+    g_key_file_unref(confile);
     cc_loging_info_print(info);
 
 }

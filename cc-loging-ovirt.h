@@ -1,13 +1,8 @@
 #ifndef __H_LOGING_OVIRT_CC_
 #define __H_LOGING_OVIRT_CC_
 #include<gtk/gtk.h>
-//#include<string.h>
-//#include<unistd.h>
-//#include"cc-loging-win.h"
 #include"cc-link-info.h"
 #include"cc-loging-info.h"
-//#define TIMEOUT_INTERVAL 2
-//#define REQUEST_INTERVAL 5
 
 typedef struct _CCOvirtInfo {
 
@@ -15,10 +10,6 @@ typedef struct _CCOvirtInfo {
     gchar *user;		//in [vmname@domain]
     gchar *passwd;		//in
     gchar *maddr;		//in
-
-//    gchar **argv;		//
-//    GString *strout;		//
-//    GString *strerr;		//
 
 } CCOvirtInfo;
 

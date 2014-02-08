@@ -59,6 +59,7 @@ void cc_link_info_to_file(CCLinkInfo * info, gchar * filename)
     g_fprintf(fd, "%s", data);
     g_free(data);
     fclose(fd);
+    g_key_file_unref(confile);
 
 }
 
@@ -72,15 +73,17 @@ void cc_link_info_read_file(CCLinkInfo * info, gchar * filename)
 	return;
     }
 //    if(g_key_file_has_key(confile,"LOGING","USER",NULL)){
-    if(info->name){g_free(info->name);info->name=NULL;}
+//    if(info->name){g_free(info->name);info->name=NULL;}
     info->name = g_key_file_get_string(confile, "LINK", "NAME", NULL);
 //    }
-    if(info->url){g_free(info->url);info->url=NULL;}
+//    if(info->url){g_free(info->url);info->url=NULL;}
     info->url = g_key_file_get_string(confile, "LINK", "URL", NULL);
-        if(info->addr){g_free(info->addr);info->addr=NULL;}
+//        if(info->addr){g_free(info->addr);info->addr=NULL;}
     info->addr=cc_get_addr_from_fullurl(info->url);
-        if(info->port){g_free(info->port);info->port=NULL;}
+//        if(info->port){g_free(info->port);info->port=NULL;}
     info->port=cc_get_port_from_fullurl(info->url);
+
+    g_key_file_unref(confile);
 }
 
 void cc_link_info_destroy(CCLinkInfo * info)
@@ -92,14 +95,25 @@ void cc_link_info_destroy(CCLinkInfo * info)
     g_free(info->port);
 
     g_free(info);
-    info=NULL;
 }
 
 void cc_link_info_clean(CCLinkInfo * info)
 {
+    if(info->name){
     g_free(info->name);
+    info->name=NULL;
+    }
+    if(info->url){
     g_free(info->url);
+    info->url=NULL;
+    }
+    if(info->addr){
     g_free(info->addr);
+    info->addr=NULL;
+    }
+    if(info->port){
     g_free(info->port);
+    info->port=NULL;
+    }
 
 }

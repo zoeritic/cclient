@@ -41,16 +41,26 @@ def get_domain(Mip):
         if dn=='internal':
             continue
         else:
-            sys.stderr.write("DOMAIN-OK")
+            sys.stdout.write(dn)
+            sys.stdout.flush()
+            sys.stderr.write("DOMAIN-OK"+"::::["+dn+"]::::\n")
 #            sys.stdout.write("DOMAIN-OK")
         return dn
 
 
 mip=sys.argv[1]
 
+domain="cclient"
+#sys.stderr.write("DOMAIN-OK")
 domain=get_domain(mip)
+#time.sleep(2)
+#sys.stdout.write(domain)
+#sys.stdout.write("\n\n\n")
 
-print domain
+sys.stdout.flush()
+sys.stderr.flush()
 
+#time.sleep(1)
+sys.exit(0)
 
 

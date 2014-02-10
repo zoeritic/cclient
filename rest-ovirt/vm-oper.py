@@ -158,9 +158,10 @@ Usage %s [OPTION.] VM
         -m | --m-plat M       \t: Set the Rhevm name.
         -l | --address ip     \t: ip of RhevM.
 
-        --up                  \t: power on VM.
-        --down                \t: shutdown VM.
-        --kill                \t: force kill VM.
+        --up    | -U              \t: power on VM.
+        --down  | -D              \t: shutdown VM.
+        --kill  | -K              \t: force kill VM.
+        --state | -S
 
         -h | --help           \t: Print this Message.
 
@@ -203,30 +204,39 @@ def main():
             vmid=get_vm_info(conf.MIPP,VM)['id']
             st=vm_start(conf.MIPP,vmid)
             if st[0]=='2':
-                sys.stderr.write("OPER-OK")
-            sys.exit(0)
+#                sys.stdout.write("::START")
+                sys.stderr.write("OPER-OK"+"::::[START]::::")
+#            sys.exit(0)
         elif o in ('-D','--down'):
             vmid=get_vm_info(conf.MIPP,VM)['id']
             st=vm_shutdown(conf.MIPP,vmid)
             if st[0]=='2':
-                sys.stderr.write("OPER-OK")
-            sys.exit(0)
+#                sys.stdout.write("::SHUTDOWN")
+                sys.stderr.write("OPER-OK"+"::::[SHUTDOWN]::::")
+#            sys.exit(0)
         elif o in ('-K','--kill'):
             hip=get_vm_info(conf.MIPP,VM)['host']
             st=kill_vm_by_name(hip,VM)
             if st[0]=='2':
-                sys.stderr.write("OPER-OK")
-            sys.exit(0)
+#                sys.stdout.write("::FORCE-KILL")
+                sys.stderr.write("OPER-OK"+"::::[FORCE-KILL]::::")
+#            sys.exit(0)
+        elif o in ('-S ,'--state'):
+            state=get_vm_info(conf.MIPP,VM)['state']
+            if state:
+                sys.stderr.write("OPER-OK STATE-OK"+"::::["+state+"]::::")
+
         elif o in ('-h','--help'):
             usage()
-            sys.exit(0)
+#            sys.exit(0)
         else:
             usage()
-            sys.exit(1)
-	#fi
+#            sys.exit(1)
+        #fi
     #rof
 
-
+    sys.stdout.flush()
+    sys.stderr.flush()
 
 
 

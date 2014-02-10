@@ -108,15 +108,25 @@ def get_vm_info(Mipp,vmname):
 def get_state(Mip,vmname):
     Mipp=gc.URL_PROTO+Mip+gc.URL_PORT
     vminfo=get_vm_info(Mipp,vmname)
-    if not vminfo['state'] is None:
-        sys.stderr.write("STATE-OK")
-        sys.stderr.write("OPER-OK")
+    stat=vminfo['state']
+    if not stat is None:
+        sys.stderr.write("STATE-OK"+"::::["+stat+"]::::")
+        sys.stderr.write("OPER-OK"+"::::["+stat+"]::::")
         sys.stdout.write(vminfo['state'])
+    else:
+        sys.stdout.write("VMINFO is None")
+        sys.stderr.write("VMINFO is None")
+    sys.stdout.flush()
+    sys.stderr.flush()
 
 
 Mip=sys.argv[1]
 vmname=sys.argv[2]
 
 get_state(Mip,vmname)
+
+
+
+sys.exit(0)
 
 

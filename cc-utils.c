@@ -102,6 +102,35 @@ gchar *cc_get_port_from_fullurl(gchar * url)
 
 
 
+gchar* cc_get_state(gchar* ss)
+{
+
+    gchar*buf=g_strdup(ss);
+
+    gchar* l=strstr(buf,"::::[");
+    gchar*r;
+    if(l){
+    
+    r=strstr(buf,"]::::");
+    
+    l=l+5;
+    *r='\0';
+    
+    gchar*nbuf=g_strdup_printf("%s",l);
+    g_free(buf);
+//    g_print("]%s[",nbuf);
+    return nbuf;
+    }
+
+    return g_strdup("None");
+
+}
+
+
+
+
+
+
 
 
 /*

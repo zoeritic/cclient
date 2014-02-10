@@ -8,6 +8,7 @@
 gchar *cc_get_addr_from_fullurl(gchar * url);
 gchar *cc_get_port_from_fullurl(gchar * url);
 
+gchar* cc_get_state(gchar* ss);
 
 
 #endif

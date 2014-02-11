@@ -7,5 +7,5 @@ rest-ovirt/rest_helper/httplib2
 rest-ovirt/.cache
 rest-ovirt/.certs
 *.pyc
-
+pics/
 cclient

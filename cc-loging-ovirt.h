@@ -1,5 +1,6 @@
 #ifndef __H_LOGING_OVIRT_CC_
 #define __H_LOGING_OVIRT_CC_
+
 #include<gtk/gtk.h>
 #include"cc-link-info.h"
 #include"cc-loging-info.h"

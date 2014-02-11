@@ -1,8 +1,7 @@
 #include"cc-loging-win.h"
 #include"cc-ovirt-vm.h"
 #include"cc-style.h"
-//#include"cc-ovirt-vm.h"
-//#include"cc-loging-ovirt.h"
+#include"config.h"
 
 G_DEFINE_TYPE(CCLogingWin, cc_loging_win, G_TYPE_OBJECT);
 

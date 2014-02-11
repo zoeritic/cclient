@@ -5,8 +5,8 @@
 #include"cc-link-info.h"
 #include"cc-loging-win.h"
 
-#define UI_MPANEL "./cc-manager-panel.ui"
-#define URL_SCHEME "https://%s.zjcloud.net:8443"
+//#define UI_MPANEL "./cc-manager-panel.ui"
+//#define URL_SCHEME "https://%s.zjcloud.net:8443"
 
 
 #define CC_TYPE_MPANEL (cc_mpanel_get_type())

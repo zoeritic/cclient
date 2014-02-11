@@ -1,4 +1,5 @@
 #include"cc-loging-ovirt.h"
+#include"config.h"
 
 
 

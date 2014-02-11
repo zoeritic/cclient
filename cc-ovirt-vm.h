@@ -7,18 +7,18 @@
 #include"cc-loging-win.h"
 //#include"cc-loging-ovirt.h"
 
-#define TIMEOUT_INTERVAL 1
-#define REQUEST_INTERVAL 5
-#define GETDOMAIN_INTERVAL 5
+//#define TIMEOUT_INTERVAL 1
+//#define REQUEST_INTERVAL 5
+//#define GETDOMAIN_INTERVAL 5
 
 
 
-#define VMSTAT_DOWN 0
-#define VMSTAT_UP 1
-#define VMSTAT_POWERING_UP 2
-#define VMSTAT_POWERING_DOWN 3
-#define VMSTAT_WAIT_FOR_LAUNCH 4
-#define VMSTAT_NON_RESPONDING 5
+//#define VMSTAT_DOWN 0
+//#define VMSTAT_UP 1
+//#define VMSTAT_POWERING_UP 2
+//#define VMSTAT_POWERING_DOWN 3
+//#define VMSTAT_WAIT_FOR_LAUNCH 4
+//#define VMSTAT_NON_RESPONDING 5
 
 
 

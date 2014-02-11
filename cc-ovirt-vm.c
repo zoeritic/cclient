@@ -1,5 +1,5 @@
 #include"cc-ovirt-vm.h"
-
+#include"cc-style.h"
 #include"cc-loging-win.h"
 #include"cc-loging-ovirt.h"
 #include"config.h"
@@ -54,7 +54,7 @@ static void set_statusbar(CCOvirtVM *ovm,gchar*text)
 
     GtkWidget* statusbar=ovm->win->winers->statusbar;
     guint cid=gtk_statusbar_get_context_id(GTK_STATUSBAR(statusbar),"vm-stating");
-    gtk_statusbar_push(statusbar,cid,text);
+    gtk_statusbar_push(GTK_STATUSBAR(statusbar),cid,text);
 
 }
 

@@ -29,7 +29,7 @@ void cc_class_add(GtkWidget*w,gchar*classname)
  }
    g_object_unref(context);
 }
-
+/*
 void cc_class_set(GtkWidget*w,gchar*classname)
 {
     GtkStyleContext*context = gtk_widget_get_style_context (w);
@@ -45,7 +45,7 @@ void cc_class_set(GtkWidget*w,gchar*classname)
 }
 
 
-
+*/
 
 
 

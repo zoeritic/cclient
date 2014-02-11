@@ -1,4 +1,5 @@
 #include "cc-utils.h"
+#include"config.h"
 //#include <glib.h>
 
 

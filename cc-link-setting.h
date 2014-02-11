@@ -6,13 +6,7 @@
 #include<string.h>
 
 
-#define LINK_NAME_SIZE 32
-
-#ifdef PATH
-#define INI_LINK_CONFIG PATH"/config/LINK.ini"
-#else
-#define INI_LINK_CONFIG "./cc-link.ini"
-#endif
+//#define LINK_NAME_SIZE 32
 
 typedef struct _link {
 //    int LINK_ID;

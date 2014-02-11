@@ -1,5 +1,6 @@
 
 #include"cc-loging-info.h"
+#include"config.h"
 
 
 void cc_loging_info_print(CCLogingInfo * info)

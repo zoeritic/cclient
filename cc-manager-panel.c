@@ -1,4 +1,5 @@
 #include"cc-manager-panel.h"
+#include"config.h"
 
 G_DEFINE_TYPE(CCMPanel, cc_mpanel, G_TYPE_OBJECT)
 

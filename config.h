@@ -2,6 +2,7 @@
 #define __CC_CONFIG_
 
 #define STYLE_PATH "./style/"
+#define STATUS_ICON "cclient.png"
 
 #define LINK_NAME_SIZE 32
 #define RESTOVIRT_DIR "./rest-ovirt/"
@@ -19,8 +20,17 @@
 #define VMSTAT_POWERING_UP 2
 #define VMSTAT_POWERING_DOWN 3
 #define VMSTAT_NON_RESPONDING 5
-#define STYLE_PATH "./style/"
-#define STYLE_PATH "./style/"
+
+
+#ifdef PATH
+#define INI_LINK_CONFIG PATH"/config/LINK.ini"
+#else
+#define INI_LINK_CONFIG "./cc-link.ini"
+#endif
+
+#define INI_LOGING_CONFIG "./cc-loging-config.ini"
+
+
 
 
 #endif

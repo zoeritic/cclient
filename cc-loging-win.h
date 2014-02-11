@@ -7,16 +7,16 @@
 #include"cc-loging-ovirt.h"
 
 
-#define GET_DOMAIN_ONCE 1
+//#define GET_DOMAIN_ONCE 1
 
 
-#define RESTOVIRT_DIR "./rest-ovirt/"
+//#define RESTOVIRT_DIR "./rest-ovirt/"
 
-#define UI_LOGING_WIN "cc-loging-win.ui"
-#define UI_LOGING_WINER "cc-loging-winer.ui"
+//#define UI_LOGING_WIN "cc-loging-win.ui"
+//#define UI_LOGING_WINER "cc-loging-winer.ui"
 
-#define INI_LOGING_CONFIG "./cc-loging-config.ini"
-#define INI_LINK_CONFIG "./cc-link-config.ini"
+//#define INI_LOGING_CONFIG "./cc-loging-config.ini"
+//#define INI_LINK_CONFIG "./cc-link-config.ini"
 
 
 #define CC_TYPE_LOGINGWIN (cc_loging_win_get_type())

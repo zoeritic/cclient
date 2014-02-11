@@ -1,5 +1,6 @@
 #include"cc-manager-applet.h"
 #include"cc-link-info.h"
+#include"config.h"
 
 CCLinkInfo*glink=NULL;
 
@@ -307,7 +308,7 @@ gboolean cc_manager_applet_setup_widget(CCManagerApplet * applet)
     applet->status_icon = gtk_status_icon_new();
     if (!applet->status_icon)
 	return FALSE;
-    gtk_status_icon_set_from_file(applet->status_icon, ICONPATH);
+    gtk_status_icon_set_from_file(applet->status_icon, STATUS_ICON);
 
 
     g_signal_connect(applet->status_icon, "activate",

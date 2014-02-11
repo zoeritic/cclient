@@ -7,8 +7,8 @@
 #include"cc-loging-win.h"
 #include"cc-manager-panel.h"
 
-#define PASSWD "123"
-#define ICONPATH "cclient.png"
+//#define PASSWD "123"
+//#define ICONPATH "cclient.png"
 
 
 #define CC_TYPE_MANAGERAPPLET          (cc_manager_applet_get_type())

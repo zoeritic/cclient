@@ -7,7 +7,7 @@
 #include<glib/gprintf.h>
 #include"cc-utils.h"
 
-#define INI_LINK_CONFIG "./cc-link-config.ini"
+//#define INI_LINK_CONFIG "./cc-link-config.ini"
 
 typedef struct _CCLinkInfo {
 

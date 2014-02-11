@@ -1,4 +1,5 @@
 #include"cc-link-info.h"
+#include"config.h"
 
 
 void cc_link_info_print(CCLinkInfo * info)

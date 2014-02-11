@@ -70,10 +70,15 @@ vmname=sys.argv[2]
 vmpasswd=sys.argv[3]
 
 
+#sys.stdout.write("AUTH-OK")
+#sys.stderr.write("AUTH-OK")
 user_authorize(mip,vmname,vmname+"@"+conf.DOMAIN,vmpasswd)
-#print"========="
-#user_authorize("10.11.4.173","DBHZX502","DBHZX502@zjcloud.net","12345678")
+
 #print"========="
 #user_authorize("10.11.4.173","DBHZX503","DBHZX503@zjcloud.net","12345678")
+
+sys.stdout.flush()
+sys.stderr.flush()
+
 
 sys.exit(0)

@@ -1,5 +1,6 @@
 #include"cc-loging-win.h"
 #include"cc-ovirt-vm.h"
+#include"cc-style.h"
 //#include"cc-ovirt-vm.h"
 //#include"cc-loging-ovirt.h"
 
@@ -181,7 +182,7 @@ static gboolean cc_loging_winer_console_cb(GtkWidget * widget,
 
     CCOvirtVM *ovm = cc_ovirt_vm_new();
     ovm->win = win;
-    cc_ovirt_vm_console( ovm);
+    cc_ovirt_vm_viewer_2( ovm);
     }
     return FALSE;
 }
@@ -224,13 +225,13 @@ static void cc_loging_winer_vm_kill_cb(GtkWidget * widget,
     g_message("force kill VM\n");
 }
 
-static void cc_loging_winer_vm_fresh_cb(GtkWidget * widget,
+static void cc_loging_winer_vm_refresh_cb(GtkWidget * widget,
 					CCLogingWin * win)
 {
     CCOvirtVM *ovm = cc_ovirt_vm_new();
     ovm->win = win;
     cc_ovirt_vm_stat_r(ovm);
-    g_message("fresh VM\n");
+    g_message("refresh VM\n");
 }
 
 static void cc_loging_winer_vm_stat(CCLogingWin*win)
@@ -282,36 +283,41 @@ void cc_loging_winer_setup(CCLogingWin * self)
     g_message("Winer Setup:Builder=%x ", builder);
 
     self->winer = GTK_WIDGET(gtk_builder_get_object(builder, "window"));
+    gtk_widget_set_name(self->winer,"win");
     GtkWidget *winer = self->winer;
 
-    GtkWidget *but_console =
-	GTK_WIDGET(gtk_builder_get_object(builder, "but_console"));
-    g_critical("but_console:%x", but_console);
+    GtkWidget *but_view =
+	GTK_WIDGET(gtk_builder_get_object(builder, "but_view"));
+    g_critical("but_view:%x", but_view);
     GtkWidget *but_back =
 	GTK_WIDGET(gtk_builder_get_object(builder, "but_back"));
-
+    gtk_widget_set_name(but_back,"winback");
     GtkWidget *but_up =
 	GTK_WIDGET(gtk_builder_get_object(builder, "but_up"));
+    gtk_widget_set_name(but_up,"vm-start");
     GtkWidget *but_down =
 	GTK_WIDGET(gtk_builder_get_object(builder, "but_down"));
+    gtk_widget_set_name(but_down,"vm-stop");
     GtkWidget *but_kill =
 	GTK_WIDGET(gtk_builder_get_object(builder, "but_kill"));
-    GtkWidget *but_fresh =
-	GTK_WIDGET(gtk_builder_get_object(builder, "but_fresh"));
+    gtk_widget_set_name(but_kill,"vm-kill");
+    GtkWidget *but_refresh =
+	GTK_WIDGET(gtk_builder_get_object(builder, "but_refresh"));
+    gtk_widget_set_name(but_refresh,"vm-refresh");
 
 
     self->winers = winer_widgets_new();
 
     self->winers->but_back = but_back;
-    self->winers->but_console = but_console;
+    self->winers->but_view = but_view;
     self->winers->but_start = but_up;
     self->winers->but_shutdown = but_down;
     self->winers->but_kill = but_kill;
-    self->winers->but_fresh = but_fresh;
+    self->winers->but_refresh = but_refresh;
 
 
 
-    g_signal_connect(G_OBJECT(but_console), "button_press_event",
+    g_signal_connect(G_OBJECT(but_view), "button_press_event",
 		     G_CALLBACK(cc_loging_winer_console_cb), self);
 
     g_signal_connect(G_OBJECT(but_back), "clicked",
@@ -325,8 +331,12 @@ void cc_loging_winer_setup(CCLogingWin * self)
 		     G_CALLBACK(cc_loging_winer_vm_down_cb), self);
     g_signal_connect(G_OBJECT(but_kill), "clicked",
 		     G_CALLBACK(cc_loging_winer_vm_kill_cb), self);
-    g_signal_connect(G_OBJECT(but_fresh), "clicked",
-		     G_CALLBACK(cc_loging_winer_vm_fresh_cb), self);
+    g_signal_connect(G_OBJECT(but_refresh), "clicked",
+		     G_CALLBACK(cc_loging_winer_vm_refresh_cb), self);
+
+
+    cc_style_setup();
+
 
     g_print("====in Winer Setup===\n");
     cc_link_info_print(glink);
@@ -536,6 +546,7 @@ void cc_loging_win_setup(CCLogingWin * self)
     self->builder = gtk_builder_new_from_file(UI_LOGING_WIN);
     GtkBuilder *builder = self->builder;
     GtkWidget *win = GTK_WIDGET(gtk_builder_get_object(builder, "window"));
+    gtk_widget_set_name(win,"win");
     self->win = win;
 
 //    g_message("enter win setup0");
@@ -612,6 +623,10 @@ void cc_loging_win_setup(CCLogingWin * self)
     g_signal_connect(G_OBJECT(entry_passwd), "activate",
 		     G_CALLBACK(cc_loging_win_passwd_act_cb), self);
 
+
+
+
+    cc_style_setup();
 
 //    gtk_window_maximize(GTK_WINDOW(win));
     gtk_window_set_position(GTK_WINDOW(win), GTK_WIN_POS_CENTER);

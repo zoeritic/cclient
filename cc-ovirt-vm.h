@@ -61,7 +61,8 @@ void cc_ovirt_vm_start_r(CCOvirtVM*ovm);
 void cc_ovirt_vm_shutdown_r(CCOvirtVM*ovm);
 void cc_ovirt_vm_kill_r(CCOvirtVM*ovm);
 void cc_ovirt_vm_stat_r(CCOvirtVM*ovm);
-void cc_ovirt_vm_console(CCOvirtVM* ovm);
+void cc_ovirt_vm_viewer(CCOvirtVM* ovm);
+void cc_ovirt_vm_viewer_2(CCOvirtVM*ovm);
 
 void cc_loging_ovirt_get_domain_r(CCOvirtVM * ovm);
 

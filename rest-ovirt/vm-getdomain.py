@@ -51,11 +51,10 @@ def get_domain(Mip):
 mip=sys.argv[1]
 
 domain="cclient"
-#sys.stderr.write("DOMAIN-OK")
+
 domain=get_domain(mip)
-#time.sleep(2)
-#sys.stdout.write(domain)
-#sys.stdout.write("\n\n\n")
+sys.stderr.write("DOMAIN-OK::::["+domain+"]::::")
+#time.sleep(1)
 
 sys.stdout.flush()
 sys.stderr.flush()

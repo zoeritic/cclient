@@ -110,8 +110,8 @@ def get_state(Mip,vmname):
     vminfo=get_vm_info(Mipp,vmname)
     stat=vminfo['state']
     if not stat is None:
-        sys.stderr.write("STATE-OK"+"::::["+stat+"]::::")
-        sys.stderr.write("OPER-OK"+"::::["+stat+"]::::")
+        sys.stderr.write("STATE-OK"+"::::["+stat+"]::::\n")
+        sys.stderr.write("OPER-OK"+"::::["+stat+"]::::\n")
         sys.stdout.write(vminfo['state'])
     else:
         sys.stdout.write("VMINFO is None")

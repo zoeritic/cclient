@@ -41,11 +41,12 @@ typedef struct _WinWidgets{
 }WinWidgets;
 typedef struct _WinerWidgets{
     GtkWidget*but_back;
-    GtkWidget*but_console;
+//    GtkWidget*but_view;
     GtkWidget*but_start;
     GtkWidget*but_shutdown;
     GtkWidget*but_kill;
-    GtkWidget*but_fresh;
+    GtkWidget*but_refresh;
+
     GtkWidget*but_view;
 
 }WinerWidgets;

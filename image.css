@@ -1,0 +1,84 @@
+
+#win{
+
+    background-image: url("./pics/cclient-bg.jpg");
+
+}
+
+
+
+GtkButton#winback{
+    background-image: url("./pics/cc-winback1.png");
+    background-position:center;
+    border:0px;
+    background-size:44px 300px;
+}
+GtkButton#winback:hover{
+    background-position:0px 0px;
+}
+GtkButton#winback:active{
+    background-position:0px 0px;
+}
+
+
+
+
+
+GtkButton#vm-start{
+    background-image: url("./pics/cc-start.png");
+    background-position:center;
+    border:0px;
+    background-size:50px 50px;
+}
+
+GtkButton#vm-start:hover{
+    background-position:0px 1px;
+}
+GtkButton#vm-start:active{
+    background-position:-1px 2px;
+}
+
+GtkButton#vm-stop{
+    background-image: url("./pics/cc-stop.png");
+    background-position:center;
+    border:0px;
+    background-size:50px 50px;
+}
+
+GtkButton#vm-stop:hover{
+    background-position:0px 1px;
+}
+GtkButton#vm-stop:active{
+    background-position:-1px 2px;
+}
+
+
+GtkButton#vm-kill{
+    background-image: url("./pics/cc-kill.png");
+    background-position:center;
+    border:0px;
+    background-size:50px 50px;
+}
+
+GtkButton#vm-kill:hover{
+    background-position:0px 1px;
+}
+GtkButton#vm-kill:active{
+    background-position:-1px 2px;
+}
+
+
+GtkButton#vm-refresh{
+    background-image: url("./pics/cc-refresh.png");
+    background-position:center;
+    border:0px;
+    background-size:50px 50px;
+}
+
+GtkButton#vm-refresh:hover{
+    background-position:0px 1px;
+}
+GtkButton#vm-refresh:active{
+    background-position:-1px 2px;
+}
+

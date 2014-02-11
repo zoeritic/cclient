@@ -22,7 +22,7 @@ int main(int argc, char **argv)
     if (!rt) {
 	g_error("cc_manager_applet_setup()\n");
     }
-   g_print("0000000000000000");
+//   g_print("0000000000000000");
 
     g_main_loop_run(loop);
     g_object_unref(G_OBJECT(applet));

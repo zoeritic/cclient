@@ -167,7 +167,7 @@ Usage %s [OPTION.] VM
 
 for Rhevm 3.1 or Ovirt 3.1
 3.2 not suitable[vm_set_ticket]
-'''%argv[0]
+'''%sys.argv[0]
     print message
 
 
@@ -175,7 +175,7 @@ for Rhevm 3.1 or Ovirt 3.1
 
 def main():
     try:
-        opts,args=getopt.getopt(sys.argv[1:],'UDKm:l:h',['m-plat=','address=','help','up','down','kill'])
+        opts,args=getopt.getopt(sys.argv[1:],'UDKm:l:hS',['m-plat=','address=','help','up','down','kill','state'])
     except getopt.GetoptError as err:
         print_err(err)
         usage()
@@ -221,7 +221,7 @@ def main():
 #                sys.stdout.write("::FORCE-KILL")
                 sys.stderr.write("OPER-OK"+"::::[FORCE-KILL]::::")
 #            sys.exit(0)
-        elif o in ('-S ,'--state'):
+        elif o in ('-S','--state'):
             state=get_vm_info(conf.MIPP,VM)['state']
             if state:
                 sys.stderr.write("OPER-OK STATE-OK"+"::::["+state+"]::::")

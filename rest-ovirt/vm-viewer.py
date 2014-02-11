@@ -25,7 +25,7 @@ class conf():
 
     FULL_SCREEN=True
 #    CONFIG_FILE='conf_vm_console.ini'
-    CERTS_DIR='.certs/'
+    CERTS_DIR='rest-ovirt/.certs/'
     PERM_PATH='~/.spicec/spice_truststore.pem'
 
     CONSOLE='spicy'
@@ -160,7 +160,10 @@ def open_viewer(Mip,vmname,user=gc.USER,passwd=gc.PASSWD,C='spicy',options=None)
     if not options is None:
         CMD=CMD+" "+options
     #fi
-    print_ok(CMD)
+    print CMD
+    sys.stderr.write("\nOPER-OK::::["+C+"]::::\n")
+    sys.stderr.flush()
+    sys.stdout.flush()
     rv=os.system(CMD)
 
 
@@ -171,4 +174,4 @@ passwd=sys.argv[3]
 
 open_viewer(Mip,vmname,user+"@zjcloud.net",passwd,'remote-viewer')
 
-
+sys.exit(0)

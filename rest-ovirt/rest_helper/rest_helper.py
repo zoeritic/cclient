@@ -147,22 +147,9 @@ def rest_request(link,method='GET',body=None,user=gc.USER,passwd=gc.PASSWD):
     Headers={'content-type':'application/xml','accept':'application/xml'}
     Method=method.upper()
     resp,content=h.request(link,method=Method,headers=Headers,body=body)
+    sys.stderr.write(resp['status'])
     return resp['status'],content
 
-##    print resp['status']
-#    ss=resp['status']
-#    print "STATUS:%s"%ss
-#    if ss[0]=='2':
-##        print_ok(resp)
-##        print "STATUS:%s"%resp['status']
-#        return content
-#    else:
-##        print "STATUS:%s"%ss
-##        if ss=='400':
-##            sys.stdout.write("400")
-##        sys.stderr.write(ss)
-##        print_info(content)
-#        return None
 
 def gen_link(m,sources):
     link=gc.URL_PROTO+gc.URL_PRE+m+gc.URL_PORT+source

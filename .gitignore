@@ -8,3 +8,4 @@ rest-ovirt/.cache
 rest-ovirt/.certs
 *.pyc
 
+cclient

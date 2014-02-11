@@ -32,9 +32,9 @@ static gboolean vm_is_executing = FALSE;	//if TRUE set,mean cant do anything thr
 static gboolean vm_start_ok = TRUE;
 static gboolean vm_stop_ok = TRUE;
 static gboolean vm_kill_ok = TRUE;
-static gboolean vm_console_ok = TRUE;
+static gboolean vm_view_ok = TRUE;
 
-static gboolean vm_consoling=FALSE;
+static gboolean vm_consoling = FALSE;
 
 
 //get_domain_r
@@ -71,11 +71,11 @@ CCOvirtVM *cc_ovirt_vm_new(void)
     return info;
 }
 
-CCOvirtVM * cc_ovirt_vm_dup(CCOvirtVM*ovm)
+CCOvirtVM *cc_ovirt_vm_dup(CCOvirtVM * ovm)
 {
     CCOvirtVM *nvm = g_new0(CCOvirtVM, 1);
-    nvm->win=ovm->win;
-    nvm->argv=g_strdupv(ovm->argv);
+    nvm->win = ovm->win;
+    nvm->argv = g_strdupv(ovm->argv);
     g_print("CCOvirtVM Dup!");
     return nvm;
 }
@@ -86,11 +86,10 @@ void cc_ovirt_vm_purge(CCOvirtVM * ovm)
 {
     g_return_if_fail(ovm != NULL);
 
-    if(ovm->argv){
-        g_strfreev(ovm->argv);
-        ovm->argv=NULL;
+    if (ovm->argv) {
+	g_strfreev(ovm->argv);
+	ovm->argv = NULL;
     }
-
     //
     g_free(ovm);
     g_message("CCOvirtVM destroyed!!");
@@ -106,45 +105,70 @@ void cc_ovirt_vm_purge(CCOvirtVM * ovm)
 
 
 static gboolean
-cb_get_domain_out_watch(GIOChannel * channel, GIOCondition cond, CCOvirtVM * ovm)
+cb_get_domain_out_watch(GIOChannel * channel, GIOCondition cond,
+			CCOvirtVM * ovm)
 {
+    gboolean need_leave = FALSE;
+    static int out_cnt;
+    out_cnt++;
+    g_critical("Callback get domain OUT watch");
+
+    g_print("OUT Watch Count::%d\n", out_cnt);
+    if (cond & G_IO_HUP) {
+	g_print("---->>:G_IO_HUP::out\n");
+	g_io_channel_unref(channel);
+	return FALSE;
+//    g_io_channel_shutdown(channel,TRUE,NULL);
+//      need_leave = TRUE;
+    }
 
     gchar *string;
     gsize size;
 
-    if (cond == G_IO_HUP) {
-	g_io_channel_unref(channel);
-	return (FALSE);
-    }
     g_print("out_watch\n");
     g_io_channel_read_line(channel, &string, &size, NULL, NULL);
 //    g_io_channel_read_to_end(channel, &string, &size, NULL);
-
+//g_print("((((((((((((((((((((((((\n");
     if (NULL == ovm->strout) {
 	ovm->strout = g_string_new("");
     }
     ovm->strout = g_string_append(ovm->strout, string);
 //    data->strout = g_strdup(g_strstrip(string));
+    g_print("soutt::]%s[\n", ovm->strout->str);
 
-    g_free(string);
+    if (string)
+	g_free(string);
 //    g_print("FREE string\n");
-
+//    if (need_leave) {
+//      g_io_channel_unref(channel);
+//      return (FALSE);
+//   }
     return (TRUE);
 }
 
 static gboolean
-cb_get_domain_err_watch(GIOChannel * channel, GIOCondition cond, CCOvirtVM * ovm)
+cb_get_domain_err_watch(GIOChannel * channel, GIOCondition cond,
+			CCOvirtVM * ovm)
 {
+    gboolean need_leave = FALSE;
+    static int out_cnt;
+    out_cnt++;
 
+    g_critical("Callback get domain ERR watch");
+
+    g_print("ERR Watch Count::%d\n", out_cnt);
+    if (cond & G_IO_HUP) {
+	g_print("---->>:G_IO_HUP::err\n");
+	g_io_channel_unref(channel);
+	return FALSE;
+//    g_io_channel_shutdown(channel,TRUE,NULL);
+//      need_leave = TRUE;
+    }
 //Error was occured;
 
     gchar *string;
     gsize size;
 
-    if (cond == G_IO_HUP) {
-	g_io_channel_unref(channel);
-	return (FALSE);
-    }
 //    domain_get_ok = FALSE;
 
     g_print("err_watch\n");
@@ -153,27 +177,38 @@ cb_get_domain_err_watch(GIOChannel * channel, GIOCondition cond, CCOvirtVM * ovm
     if (NULL == ovm->strerr) {
 	ovm->strerr = g_string_new("");
     }
+//g_print(":::::::[]%s[]\n",ovm->strerr->str);
     ovm->strerr = g_string_append(ovm->strerr, string);
+//g_print("=++++++++++++++\n");
+    g_print("serrr::]%s[\n", ovm->strerr->str);
 
-
-    g_free(string);
+    if (string)
+	g_free(string);
+//    if (need_leave) {
+//      g_io_channel_unref(channel);
+//      return (FALSE);
+//   }
 
     return (TRUE);
 }
 
-static void cb_get_domain_child_watch(GPid pid, gint status, CCOvirtVM * ovm)
+static void cb_get_domain_child_watch(GPid pid, gint status,
+				      CCOvirtVM * ovm)
 /* if process exited & get nothing from stderr,then the process executed successfully!
  *
  * */
 {
     /*clean strout & strerr in CCOvirtInfo */
     gchar *sout = NULL, *serr = NULL;
-    if (NULL != ovm->strout) {
+/*    if (NULL != ovm->strout) {
 	sout = g_strstrip(g_string_free(ovm->strout, FALSE));
 	ovm->strout = NULL;
 	g_message("STROUT::\n%s", sout);
 //        g_free(sout);
     }
+
+    */
+
     if (NULL != ovm->strerr) {
 	serr = g_strstrip(g_string_free(ovm->strerr, FALSE));
 	ovm->strerr = NULL;
@@ -181,8 +216,15 @@ static void cb_get_domain_child_watch(GPid pid, gint status, CCOvirtVM * ovm)
 	ovm->strerr = NULL;
 //        g_free(serr);
     }
-    if(NULL==strstr(serr,"DOMAIN-OK"))
-        domain_get_ok=FALSE;
+    if (NULL == strstr(serr, "DOMAIN-OK")) {
+	domain_get_ok = FALSE;
+    } else {
+	domain_get_ok = TRUE;
+
+	sout = cc_get_state(serr);
+
+    }
+
     g_print("child_watch\n");
 
     if (domain_get_ok) {
@@ -237,7 +279,7 @@ static gboolean timeout_getdomain_cb(CCOvirtVM * ovm)
 //        
 //   }
 
-    gdk_threads_enter();
+//    gdk_threads_enter();
     g_message("Timeout get domain ...");
     /* Bounce progress bar */
     GtkWidget *combo_domain = ovm->win->wins->combo_domain;	//data->combo_domain;
@@ -247,7 +289,7 @@ static gboolean timeout_getdomain_cb(CCOvirtVM * ovm)
 				   pulse_c[pulse]);
     gtk_combo_box_set_active(GTK_COMBO_BOX(combo_domain), 0);
     pulse = (pulse + 1) % 5;
-gdk_threads_leave();
+//gdk_threads_leave();
 
     return (TRUE);
 }
@@ -259,8 +301,10 @@ static gboolean spawn_async_get_domain(CCOvirtVM * ovm)
 
     g_message("Spawn get domain....");
     GPid pid;
-    gchar *argv[] = { "./rest-ovirt/vm-getdomain.py", ovm->win->ovirt->maddr,
-	NULL};
+    gchar *argv[] =
+	{ "./rest-ovirt/vm-getdomain.py", ovm->win->ovirt->maddr,
+	NULL
+    };
 
 
     g_print("Argv-->\n");
@@ -284,17 +328,27 @@ static gboolean spawn_async_get_domain(CCOvirtVM * ovm)
     }
     /* Add watch function to catch termination of the process. This function
      *      * will clean any remnants of process. */
-    g_child_watch_add(pid, (GChildWatchFunc) cb_get_domain_child_watch, ovm);
+    g_child_watch_add(pid, (GChildWatchFunc) cb_get_domain_child_watch,
+		      ovm);
 
     /* Create channels that will be used to read data from pipes. */
     out_ch = g_io_channel_unix_new(out);
     err_ch = g_io_channel_unix_new(err);
+    /*configure channels */
+/*
+    g_io_channel_set_encoding (out_ch, NULL, NULL);
+    g_io_channel_set_encoding (err_ch, NULL, NULL);
+    g_io_channel_set_buffer_size(out_ch,0);
+    g_io_channel_set_buffer_size(err_ch,0);
+    g_io_channel_set_flags(out_ch,G_IO_FLAG_NONBLOCK,NULL);
+    g_io_channel_set_flags(err_ch,G_IO_FLAG_NONBLOCK,NULL);
+    */
 
     /* Add watches to channels */
-    g_io_add_watch(out_ch, G_IO_IN | G_IO_HUP, (GIOFunc) cb_get_domain_out_watch,
-		   ovm);
-    g_io_add_watch(err_ch, G_IO_IN | G_IO_HUP, (GIOFunc) cb_get_domain_err_watch,
-		   ovm);
+//    g_io_add_watch(out_ch, G_IO_IN | G_IO_HUP,
+//                 (GIOFunc) cb_get_domain_out_watch, ovm);
+    g_io_add_watch(err_ch, G_IO_IN | G_IO_HUP,
+		   (GIOFunc) cb_get_domain_err_watch, ovm);
 
     return FALSE;
 }
@@ -351,7 +405,7 @@ cb_stat_vm_out_watch(GIOChannel * channel, GIOCondition cond,
     gchar *string;
     gsize size;
 
-    if (cond == G_IO_HUP) {
+    if (cond & G_IO_HUP) {
 	g_io_channel_unref(channel);
 	return (FALSE);
     }
@@ -384,7 +438,7 @@ cb_stat_vm_err_watch(GIOChannel * channel, GIOCondition cond,
     gchar *string;
     gsize size;
 
-    if (cond == G_IO_HUP) {
+    if (cond & G_IO_HUP) {
 	g_io_channel_unref(channel);
 	return (FALSE);
     }
@@ -414,18 +468,22 @@ static void cb_stat_vm_child_watch(GPid pid, gint status, CCOvirtVM * ovm)
 {
     /*clean strout & strerr in CCOvirtInfo */
     gchar *sout = NULL, *serr = NULL;
-    if (NULL != ovm->strout) {
+/*    if (NULL != ovm->strout) {
 	sout = g_strstrip(g_string_free(ovm->strout, FALSE));
 	ovm->strout = NULL;
 	g_message("STROUT::\n%s", sout);
 //        g_free(sout);
     }
+
+    */
     if (NULL != ovm->strerr) {
 	serr = g_strstrip(g_string_free(ovm->strerr, FALSE));
 	ovm->strerr = NULL;
 	g_message("STRERR::\n%s", serr);
 	ovm->strerr = NULL;
 //        g_free(serr);
+	sout = cc_get_state(serr);
+
     }
 
     g_print("vm_stat_child_watch\n");
@@ -434,15 +492,14 @@ static void cb_stat_vm_child_watch(GPid pid, gint status, CCOvirtVM * ovm)
 
     if (!g_strcmp0(sout, vm_stat_expect)
 	|| vm_stating_cnt >= STATING_TIMEOUT_MAX) {
-	gchar *msg =
-	    g_strdup_printf("Catch expected status of VM:[%s]",
-			    vm_stat_expect);
+	gchar *msg = g_strdup_printf("Catch expected status of VM:[%s]",
+				     vm_stat_expect);
 	g_message("%s", msg);
 	g_free(msg);
 
 	g_source_remove(ovm->timeout_id);
 
-	GtkWidget *console = ovm->win->winers->but_console;	// data->combo_domain;
+	GtkWidget *console = ovm->win->winers->but_view;	// data->combo_domain;
 
 	if (!g_strcmp0(sout, vm_stat_expect)) {
 	    if (!strcmp(vm_stat_expect, "up")) {
@@ -459,13 +516,13 @@ static void cb_stat_vm_child_watch(GPid pid, gint status, CCOvirtVM * ovm)
 
 	cc_ovirt_vm_purge(ovm);
 	g_free(vm_stat_expect);
-    g_print("FREEEEEEEEEEEEEEEE\n");
+//    g_print("FREEEEEEEEEEEEEEEE\n");
 	vm_stating = FALSE;
 	vm_stating_cnt = 0;
 
     } else {
 
-	g_warning("Stat VM  Failed!Will retry latter..");
+	g_warning("VM State doesn't meet Expected !Will retry latter..");
 
 	vm_stating_cnt++;
 	spawn_async_stat_vm_with_delay(ovm, REQUEST_INTERVAL);
@@ -498,7 +555,7 @@ static gboolean timeout_stat_vm_cb(CCOvirtVM * ovm)
 //      { "•", "••", "•••", "••••",
 //"•••••" };
 
-    GtkWidget *console = ovm->win->winers->but_console;	//data->combo_domain;
+    GtkWidget *console = ovm->win->winers->but_view;	//data->combo_domain;
 
     gtk_button_set_label(GTK_BUTTON(console), pulse_c[pulse]);
 
@@ -524,7 +581,7 @@ static gboolean spawn_async_stat_vm(CCOvirtVM * ovm)
         "-s", ovm->win->ovirt->vmname,
 NULL };
 */
-    gchar**argv=ovm->argv;
+    gchar **argv = ovm->argv;
 
     g_print("Argv-->\n");
     int i;
@@ -551,12 +608,19 @@ NULL };
     g_child_watch_add(pid, (GChildWatchFunc) cb_stat_vm_child_watch, ovm);
 
     /* Create channels that will be used to read data from pipes. */
-    out_ch = g_io_channel_unix_new(out);
+//    out_ch = g_io_channel_unix_new(out);
     err_ch = g_io_channel_unix_new(err);
-
+/*
+    g_io_channel_set_encoding (out_ch, NULL, NULL);
+    g_io_channel_set_encoding (err_ch, NULL, NULL);
+    g_io_channel_set_buffer_size(out_ch,0);
+    g_io_channel_set_buffer_size(err_ch,0);
+    g_io_channel_set_flags(out_ch,G_IO_FLAG_NONBLOCK,NULL);
+    g_io_channel_set_flags(err_ch,G_IO_FLAG_NONBLOCK,NULL);
+*/
     /* Add watches to channels */
-    g_io_add_watch(out_ch, G_IO_IN | G_IO_HUP,
-		   (GIOFunc) cb_stat_vm_out_watch, ovm);
+//    g_io_add_watch(out_ch, G_IO_IN | G_IO_HUP,
+//                 (GIOFunc) cb_stat_vm_out_watch, ovm);
     g_io_add_watch(err_ch, G_IO_IN | G_IO_HUP,
 		   (GIOFunc) cb_stat_vm_err_watch, ovm);
 
@@ -589,16 +653,18 @@ void cc_ovirt_stating_vm_r(CCOvirtVM * ovm)
     if (vm_stating)
 	return;
 
-    vm_stating=TRUE;
+    vm_stating = TRUE;
 
     pulse = 0;
-    
+
     gchar *argv[] = { "./rest-ovirt/vm-stat.py", ovm->win->ovirt->maddr,
 	ovm->win->ovirt->vmname, NULL
     };
 
-    if(ovm->argv)
-        g_strfreev(ovm->argv);
+    if (ovm->argv)
+	g_strfreev(ovm->argv);
+
+//    g_print("-------------------------------------------------\n");
 
     ovm->argv = g_strdupv(argv);
     spawn_async_stat_vm(ovm);
@@ -620,7 +686,7 @@ vm_out_watch(GIOChannel * channel, GIOCondition cond, CCOvirtVM * ovm)
     gchar *string;
     gsize size;
 
-    if (cond == G_IO_HUP) {
+    if (cond & G_IO_HUP) {
 	g_io_channel_unref(channel);
 	return (FALSE);
     }
@@ -645,15 +711,15 @@ vm_err_watch(GIOChannel * channel, GIOCondition cond, CCOvirtVM * ovm)
     gchar *string;
     gsize size;
 
-    if (cond == G_IO_HUP) {
+    if (cond & G_IO_HUP) {
 	g_io_channel_unref(channel);
 	return (FALSE);
     }
 //    *ovm->op = FALSE;
 
     g_print("::vm_err_watch\n");
-    g_io_channel_read_line(channel, &string, &size, NULL, NULL);
-//    g_io_channel_read_to_end(channel, &string, &size, NULL);
+//    g_io_channel_read_line(channel, &string, &size, NULL, NULL);
+    g_io_channel_read_to_end(channel, &string, &size, NULL);
 
     if (NULL == ovm->strerr) {
 	ovm->strerr = g_string_new("");
@@ -677,25 +743,31 @@ static void vm_child_watch(GPid pid, gint status, CCOvirtVM * ovm)
 
     /*clean strout & strerr in CCOvirtInfo */
     gchar *sout = NULL, *serr = NULL;
-    if (NULL != ovm->strout) {
+/*    if (NULL != ovm->strout) {
 	sout = g_strstrip(g_string_free(ovm->strout, FALSE));
 	ovm->strout = NULL;
 	g_message("STROUT::\n%s", sout);
 //        g_free(out);
     }
+    */
+
     if (NULL != ovm->strerr) {
 	serr = g_strstrip(g_string_free(ovm->strerr, FALSE));
 	ovm->strerr = NULL;
 	g_message("STRERR::\n%s", serr);
 //        g_free(err);
     }
-    if(NULL==strstr(serr,"OPER-OK"))
-        *ovm->op = FALSE;
+    if (NULL == strstr(serr, "OPER-OK")) {
+	*ovm->op = FALSE;
+    } else {
+	*ovm->op = TRUE;
+	sout = cc_get_state(serr);
 
-
-
+    }
+    g_critical(">>>>>>>%s<<<<<<[%d]<",sout,*ovm->op);
+    
     if (*ovm->op) {
-	g_message("VM's Operation Success.");
+	g_message("VM's Operation Success.-->[%s]", sout);
 	//gtk_widget_set_sensitive (, TRUE);
 	//
 	//
@@ -705,76 +777,64 @@ static void vm_child_watch(GPid pid, gint status, CCOvirtVM * ovm)
 	 * vm_stat
 	 * */
 	if (ovm->op == &vm_stat_ok) {
-        g_print("in child watch {vm_stat_ok}..\n");
-	    GtkWidget *console = ovm->win->winers->but_console;	// data->combo_domain;
+	    g_print("in child watch {vm_stat_ok}..\n");
+	    GtkWidget *console = ovm->win->winers->but_view;	// data->combo_domain;
 	    if (!strcmp(sout, "up")) {
 		gtk_widget_set_sensitive(console, TRUE);
 	    } else {
 		gtk_widget_set_sensitive(console, FALSE);
 	    }
 //    g_print("==================\n");
-	}else
-	/*
-	 *vm_start
-	 * */
+	} else
+	    /*
+	     *vm_start
+	     * */
 	if (ovm->op == &vm_start_ok) {
 
 	    CCOvirtVM *svm = cc_ovirt_vm_dup(ovm);
-//	    svm->win = ovm->win;
+//          svm->win = ovm->win;
 	    cc_ovirt_stating_vm_r(svm);
 
-	}else
-	/*
-	 *vm_stop
-	 * */
+	} else
+	    /*
+	     *vm_stop
+	     * */
 	if (ovm->op == &vm_stop_ok) {
 
 	    CCOvirtVM *svm = cc_ovirt_vm_dup(ovm);
-//	    svm->win = ovm->win;
+//          svm->win = ovm->win;
 	    cc_ovirt_stating_vm_r(svm);
 
-	}else
-	/*
-	 *vm_kill
-	 * */
+	} else
+	    /*
+	     *vm_kill
+	     * */
 	if (ovm->op == &vm_kill_ok) {
 
 	    CCOvirtVM *svm = cc_ovirt_vm_dup(ovm);
-//	    svm->win = ovm->win;
+//          svm->win = ovm->win;
 //        svm->argv=g_strdupv(ovm->argv);
 	    cc_ovirt_stating_vm_r(svm);
 
-	}else
-
-
-    if (ovm->op == &vm_console_ok){
-        g_print("About to Open Spice Console..\n");  
+	} else if (ovm->op == &vm_view_ok) {
+	    g_print("Open Spice Viewer..\n");
 //        vm_consoling=TRUE;
 //    g_message();
-    
-    }
 
-
-
-
-    g_print("Before Purge\n");
+	}
+//      g_print("Before Purge\n");
 	cc_ovirt_vm_purge(ovm);
-    g_print("After Purge\n");
-
-
+//      g_print("After Purge\n");
 
     } else {			//operation on VM failed!!
 
-
-
 	g_warning("VM's operation Failed!!");
-	//stop stating_vm..
 
 	//TODO
 
     }
 
-    g_print("[]][][][\n");
+//    g_print("[]][][][\n");
 
     vm_is_executing = FALSE;
 //    *ovm->op = TRUE;
@@ -821,12 +881,19 @@ static void spawn_async_vm(CCOvirtVM * ovm)
     g_child_watch_add(pid, (GChildWatchFunc) vm_child_watch, ovm);
 
     /* Create channels that will be used to read data from pipes. */
-    out_ch = g_io_channel_unix_new(out);
+//    out_ch = g_io_channel_unix_new(out);
     err_ch = g_io_channel_unix_new(err);
-
+/*
+    g_io_channel_set_encoding (out_ch, NULL, NULL);
+    g_io_channel_set_encoding (err_ch, NULL, NULL);
+    g_io_channel_set_buffer_size(out_ch,0);
+    g_io_channel_set_buffer_size(err_ch,0);
+    g_io_channel_set_flags(out_ch,G_IO_FLAG_NONBLOCK,NULL);
+    g_io_channel_set_flags(err_ch,G_IO_FLAG_NONBLOCK,NULL);
+*/
     /* Add watches to channels */
-    g_io_add_watch(out_ch, G_IO_IN | G_IO_HUP, (GIOFunc) vm_out_watch,
-		   ovm);
+//    g_io_add_watch(out_ch, G_IO_IN | G_IO_HUP, (GIOFunc) vm_out_watch,
+//                 ovm);
     g_io_add_watch(err_ch, G_IO_IN | G_IO_HUP, (GIOFunc) vm_err_watch,
 		   ovm);
 
@@ -843,14 +910,15 @@ void cc_ovirt_vm_start_r(CCOvirtVM * ovm)	//, CCLogingWin * w)
 {
 //    CCOvirtInfo* info=cc_ovirt_info_copy(ovirt);
 
-    if (vm_is_executing||vm_stating) {
+    if (vm_is_executing || vm_stating) {
 	g_message("IS EXECUTING...");
 	return;
     }
     vm_start_ok = TRUE;
 
-    gchar *argv[] = { "./rest-ovirt/vm-oper.py", "-l", ovm->win->ovirt->maddr,
-	"-U",ovm->win->ovirt->vmname, NULL
+    gchar *argv[] =
+	{ "./rest-ovirt/vm-oper.py", "-l", ovm->win->ovirt->maddr,
+	"-U", ovm->win->ovirt->vmname, NULL
     };
 
     ovm->argv = g_strdupv(argv);
@@ -866,13 +934,14 @@ void cc_ovirt_vm_shutdown_r(CCOvirtVM * ovm)	//, CCLogingWin * w)
 {
 //    CCOvirtInfo* info=cc_ovirt_info_copy(ovirt);
 
-    if (vm_is_executing|| vm_stating) {
+    if (vm_is_executing || vm_stating) {
 	g_message("IS EXECUTING...");
 	return;
     }
     vm_stop_ok = TRUE;
 
-    gchar *argv[] = { "./rest-ovirt/vm-oper.py", "-l",ovm->win->ovirt->maddr,
+    gchar *argv[] =
+	{ "./rest-ovirt/vm-oper.py", "-l", ovm->win->ovirt->maddr,
 	"-D", ovm->win->ovirt->vmname, NULL
     };
 
@@ -889,13 +958,14 @@ void cc_ovirt_vm_kill_r(CCOvirtVM * ovm)	//, CCLogingWin * w)
 {
 //    CCOvirtInfo* info=cc_ovirt_info_copy(ovirt);
 
-    if (vm_is_executing|| vm_stating) {
+    if (vm_is_executing || vm_stating) {
 	g_message("IS EXECUTING...");
 	return;
     }
     vm_kill_ok = TRUE;
 
-    gchar *argv[] = { "./rest-ovirt/vm-oper.py", "-l", ovm->win->ovirt->maddr,"-K",
+    gchar *argv[] =
+	{ "./rest-ovirt/vm-oper.py", "-l", ovm->win->ovirt->maddr, "-K",
 	ovm->win->ovirt->vmname, NULL
     };
 
@@ -930,56 +1000,68 @@ void cc_ovirt_vm_stat_r(CCOvirtVM * ovm)	//, CCLogingWin * w)
 
 }
 
-void cc_ovirt_vm_stat_sync(CCOvirtVM *ovm)
+void cc_ovirt_vm_stat_sync(CCOvirtVM * ovm)
 {
 
-    gchar* cmd=g_strdup_printf("./rest-ovirt/vm-stat.py %s %s",
-            ovm->win->ovirt->maddr,
-            ovm->win->ovirt->vmname);
-    gchar*out,*err;
+    gchar *cmd = g_strdup_printf("./rest-ovirt/vm-stat.py %s %s",
+				 ovm->win->ovirt->maddr,
+				 ovm->win->ovirt->vmname);
+    gchar *out, *err;
 //    gint status;
-    GError*e=NULL;//g_error_new();
-    g_message("==-=-=-=::%s:: ",cmd);
+    GError *e = NULL;		//g_error_new();
+    g_message("==-=-=-=::%s:: ", cmd);
 
-    if (!g_spawn_command_line_sync(cmd,&out,&err,NULL,&e))
-    {
-        g_critical("SPAWN ERROR :VM STATING sync!!-%s-",e->message);
-    g_error_free(e);
-    g_free(cmd);
-    return;
-    }else{
-    
-    g_print("OUT::%s:: \tERR::%s::\n",out,err);
+    if (!g_spawn_command_line_sync(cmd, &out, &err, NULL, &e)) {
+	g_critical("SPAWN ERROR :VM STATING sync!!-%s-", e->message);
+	g_error_free(e);
+	g_free(cmd);
+	return;
+    } else {
+
+	g_print("OUT::%s:: \tERR::%s::\n", out, err);
 //    g_free(out);
 //    g_free(err);
-    if(NULL!=strstr(err,"STAT-OK"))
-        g_print("VM-status::%s",out);
-    g_error_free(e);
-    g_free(cmd);
-    return ;
-    } 
+	if (NULL != strstr(err, "STAT-OK"))
+	    g_print("VM-status::%s", out);
+	g_error_free(e);
+	g_free(cmd);
+	return;
+    }
 }
 
 
-
-
-
-void cc_ovirt_vm_console(CCOvirtVM* ovm)
+/*
+void cc_ovirt_vm_viewer(CCOvirtVM* ovm)
 {
-//    if(vm_is_executing||vm_stating)
-    if(vm_consoling){
-    
+
+    gchar* argv[]={"./rest-ovirt/vm-viewer.py",ovm->win->ovirt->maddr,ovm->win->ovirt->vmname,
+                    ovm->win->ovirt->user,ovm->win->ovirt->passwd,NULL};
+
+    ovm->argv=g_strdupv(argv);
+    ovm->op
+
+
+}
+
+*/
+
+void cc_ovirt_vm_viewer(CCOvirtVM * ovm)
+{
+    if (vm_is_executing) {
+//    if (vm_consoling) {
+	return;
     }
 
-    vm_console_ok=TRUE;
+    vm_view_ok = TRUE;
 
- gchar *argv[] = { OVIRT_VMOPER, "-l", ovm->win->ovirt->maddr, "-u",
-	ovm->win->ovirt->user, "-p", ovm->win->ovirt->passwd ,"-S",
-	ovm->win->ovirt->vmname, NULL
+    gchar *argv[] = { "./rest-ovirt/vm-viewer.py", ovm->win->ovirt->maddr,
+	ovm->win->ovirt->vmname,
+	ovm->win->ovirt->user, ovm->win->ovirt->passwd,
+	NULL
     };
 
     ovm->argv = g_strdupv(argv);
-    ovm->op = &vm_console_ok;
+    ovm->op = &vm_view_ok;
 
     spawn_async_vm(ovm);
 
@@ -987,7 +1069,29 @@ void cc_ovirt_vm_console(CCOvirtVM* ovm)
 }
 
 
+void cc_ovirt_vm_viewer_2(CCOvirtVM*ovm)
+{
+    if (vm_is_executing) {
+//    if (vm_consoling) {
+	return;
+    }
 
+    vm_view_ok = TRUE;
+
+    gchar *argv[] = { "./rest-ovirt/vm-viewer.py", ovm->win->ovirt->maddr,
+	ovm->win->ovirt->vmname,
+	ovm->win->ovirt->passwd,
+	NULL
+    };
+
+//    ovm->argv = g_strdupv(argv);
+//    ovm->op = &vm_view_ok;
+//    GPid pid;
+    gint st;
+    gboolean rv=g_spawn_sync(NULL,argv,NULL,0,NULL,NULL,NULL,NULL,&st,NULL);
+
+
+}
 
 
 

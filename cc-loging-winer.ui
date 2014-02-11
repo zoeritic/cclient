@@ -50,7 +50,7 @@
                 <child>
                   <object class="GtkButton" id="but_view">
                     <property name="width_request">200</property>
-                    <property name="height_request">200</property>
+                    <property name="height_request">150</property>
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <property name="receives_default">True</property>
@@ -62,7 +62,7 @@
                   </packing>
                 </child>
                 <child>
-                  <object class="GtkLabel" id="info">
+                  <object class="GtkLabel" id="infolabel">
                     <property name="height_request">20</property>
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
@@ -142,7 +142,7 @@
                   </packing>
                 </child>
                 <child>
-                  <object class="GtkStatusbar" id="status">
+                  <object class="GtkStatusbar" id="statusbar">
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
                     <property name="orientation">vertical</property>

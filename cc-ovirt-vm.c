@@ -2,6 +2,7 @@
 
 #include"cc-loging-win.h"
 #include"cc-loging-ovirt.h"
+#include"config.h"
 
 #define OVIRT_VMOPER "./rest-ovirt/vm-helper.py"
 
@@ -48,6 +49,22 @@ static guint sindex = 0;
 static guint pulseinterval[] = { 5, 15, 35, 10 };
 
 
+static void set_statusbar(CCOvirtVM *ovm,gchar*text)
+{
+
+    GtkWidget* statusbar=ovm->win->winers->statusbar;
+    guint cid=gtk_statusbar_get_context_id(GTK_STATUSBAR(statusbar),"vm-stating");
+    gtk_statusbar_push(statusbar,cid,text);
+
+}
+
+static void set_infolabel(CCOvirtVM *ovm,gchar*text)
+{
+    GtkWidget* infolabel=ovm->win->winers->infolabel;
+    gtk_label_set_text(GTK_LABEL(infolabel),text);
+    gtk_label_set_justify(GTK_LABEL(infolabel),GTK_JUSTIFY_CENTER);
+
+}
 
 guint cc_ovirt_stat_pulse()
 {
@@ -498,20 +515,22 @@ static void cb_stat_vm_child_watch(GPid pid, gint status, CCOvirtVM * ovm)
 	g_free(msg);
 
 	g_source_remove(ovm->timeout_id);
+    set_infolabel(ovm,"");
+    set_statusbar(ovm,"操作成功");
 
-	GtkWidget *console = ovm->win->winers->but_view;	// data->combo_domain;
+	GtkWidget *viewer = ovm->win->winers->but_view;	// data->combo_domain;
 
 	if (!g_strcmp0(sout, vm_stat_expect)) {
 	    if (!strcmp(vm_stat_expect, "up")) {
-		gtk_widget_set_sensitive((console), TRUE);
+		gtk_widget_set_sensitive((viewer), TRUE);
 
 	    } else {		// if(!strcmp(vm_stat_expect,"down")){
-		gtk_widget_set_sensitive((console), FALSE);
+		gtk_widget_set_sensitive((viewer), FALSE);
 
 	    }
 	} else if (vm_stating_cnt >= STATING_TIMEOUT_MAX) {
 	    g_critical("VM Stating counter Ran out");
-	    gtk_widget_set_sensitive((console), FALSE);
+	    gtk_widget_set_sensitive((viewer), FALSE);
 	}
 
 	cc_ovirt_vm_purge(ovm);
@@ -555,9 +574,14 @@ static gboolean timeout_stat_vm_cb(CCOvirtVM * ovm)
 //      { "•", "••", "•••", "••••",
 //"•••••" };
 
-    GtkWidget *console = ovm->win->winers->but_view;	//data->combo_domain;
-
-    gtk_button_set_label(GTK_BUTTON(console), pulse_c[pulse]);
+//    GtkWidget *viewer = ovm->win->winers->but_view;	//data->combo_domain;
+//    GtkWidget* infolabel=ovm->win->winers->infolabel;
+//    guint cid=gtk_statusbar_get_context_id(GTK_STATUSBAR(statusbar),"vm-stating");
+//    gtk_statusbar_push(statusbar,cid,pulse_c[pulse]);
+    set_infolabel(ovm,pulse_c[pulse]);
+//    gtk_label_set_text(GTK_LABEL(infolabel),pulse_c[pulse]);
+//    gtk_label_set_justify(GTK_LABEL(infolabel),GTK_JUSTIFY_CENTER);
+//    gtk_button_set_label(GTK_BUTTON(viewer), pulse_c[pulse]);
 
 //    gtk_combo_box_text_remove(GTK_COMBO_BOX_TEXT(combo_domain), 0);
 //    gtk_combo_box_text_insert_text(GTK_COMBO_BOX_TEXT(combo_domain), 0,
@@ -778,12 +802,18 @@ static void vm_child_watch(GPid pid, gint status, CCOvirtVM * ovm)
 	 * */
 	if (ovm->op == &vm_stat_ok) {
 	    g_print("in child watch {vm_stat_ok}..\n");
-	    GtkWidget *console = ovm->win->winers->but_view;	// data->combo_domain;
+	    GtkWidget *viewer = ovm->win->winers->but_view;	// data->combo_domain;
 	    if (!strcmp(sout, "up")) {
-		gtk_widget_set_sensitive(console, TRUE);
+		gtk_widget_set_sensitive(viewer, TRUE);
+        cc_set_css(viewer,STYLE_PATH "viewer-up.css");
+//        cc_class_set(viewer,"up");
+//        gtk_widget_set_name(viewer,"")
 	    } else {
-		gtk_widget_set_sensitive(console, FALSE);
+		gtk_widget_set_sensitive(viewer, FALSE);
+        cc_set_css(viewer,STYLE_PATH "viewer-down.css");
+//        cc_class_set(viewer,"down");
 	    }
+        set_statusbar(ovm,"");
 //    g_print("==================\n");
 	} else
 	    /*
@@ -794,6 +824,7 @@ static void vm_child_watch(GPid pid, gint status, CCOvirtVM * ovm)
 	    CCOvirtVM *svm = cc_ovirt_vm_dup(ovm);
 //          svm->win = ovm->win;
 	    cc_ovirt_stating_vm_r(svm);
+        set_statusbar(ovm,"启动中，请稍后");
 
 	} else
 	    /*
@@ -804,6 +835,7 @@ static void vm_child_watch(GPid pid, gint status, CCOvirtVM * ovm)
 	    CCOvirtVM *svm = cc_ovirt_vm_dup(ovm);
 //          svm->win = ovm->win;
 	    cc_ovirt_stating_vm_r(svm);
+        set_statusbar(ovm,"等待关闭完成");
 
 	} else
 	    /*
@@ -815,6 +847,8 @@ static void vm_child_watch(GPid pid, gint status, CCOvirtVM * ovm)
 //          svm->win = ovm->win;
 //        svm->argv=g_strdupv(ovm->argv);
 	    cc_ovirt_stating_vm_r(svm);
+        set_statusbar(ovm,"等待断电完成");
+
 
 	} else if (ovm->op == &vm_view_ok) {
 	    g_print("Open Spice Viewer..\n");
@@ -828,7 +862,8 @@ static void vm_child_watch(GPid pid, gint status, CCOvirtVM * ovm)
 
     } else {			//operation on VM failed!!
 
-	g_warning("VM's operation Failed!!");
+    set_statusbar(ovm,"");
+        g_warning("VM's operation Failed!!");
 
 	//TODO
 
@@ -923,6 +958,7 @@ void cc_ovirt_vm_start_r(CCOvirtVM * ovm)	//, CCLogingWin * w)
 
     ovm->argv = g_strdupv(argv);
     ovm->op = &vm_start_ok;
+    set_statusbar(ovm,"正在启动虚拟机");
 
     spawn_async_vm(ovm);
     g_print("vm_start_r...........\n");
@@ -947,8 +983,10 @@ void cc_ovirt_vm_shutdown_r(CCOvirtVM * ovm)	//, CCLogingWin * w)
 
     ovm->argv = g_strdupv(argv);
     ovm->op = &vm_stop_ok;
+    set_statusbar(ovm,"正在关闭虚拟机");
 
     spawn_async_vm(ovm);
+    g_print("vm_stop_r...........\n");
 
 
 }
@@ -971,8 +1009,10 @@ void cc_ovirt_vm_kill_r(CCOvirtVM * ovm)	//, CCLogingWin * w)
 
     ovm->argv = g_strdupv(argv);
     ovm->op = &vm_kill_ok;
+    set_statusbar(ovm,"强制断电");
 
     spawn_async_vm(ovm);
+    g_print("vm_kill_r...........\n");
 
 
 }
@@ -995,8 +1035,11 @@ void cc_ovirt_vm_stat_r(CCOvirtVM * ovm)	//, CCLogingWin * w)
     ovm->argv = g_strdupv(argv);
     ovm->op = &vm_stat_ok;
 
+    set_statusbar(ovm,"刷新状态");
+
     spawn_async_vm(ovm);
 
+    g_print("vm_refresh_r...........\n");
 
 }
 

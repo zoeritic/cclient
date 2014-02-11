@@ -49,6 +49,9 @@ typedef struct _WinerWidgets{
 
     GtkWidget*but_view;
 
+    GtkWidget*statusbar;
+    GtkWidget*infolabel;
+
 }WinerWidgets;
 
 

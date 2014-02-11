@@ -1,5 +1,6 @@
 #include<gtk/gtk.h>
 #include"cc-manager-applet.h"
+#include"config.h"
 
 
 static GMainLoop *loop = NULL;

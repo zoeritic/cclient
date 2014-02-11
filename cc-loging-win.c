@@ -54,6 +54,7 @@ void cc_loging_win_clean(CCLogingWin * self);
 void cc_loging_winer_clean(CCLogingWin * self);
 
 
+static void auth_dialog_error(CCLogingWin*self);
 
 
 
@@ -172,12 +173,12 @@ static void cc_loging_winer_goback_cb(GtkWidget * widget,
 
 }
 
-static gboolean cc_loging_winer_console_cb(GtkWidget * widget,
+static gboolean cc_loging_winer_view_cb(GtkWidget * widget,
 					   GdkEventButton * event,
 					   CCLogingWin * win)
 {
     if (event->type == GDK_2BUTTON_PRESS) {
-	g_message("open console\n");
+	g_message("open view\n");
   // 
 
     CCOvirtVM *ovm = cc_ovirt_vm_new();
@@ -246,6 +247,22 @@ static void cc_loging_winer_vm_stat(CCLogingWin*win)
 
 
 
+
+
+static void auth_dialog_error(CCLogingWin*self)
+{
+
+    GtkWidget*dialog = GTK_WIDGET(gtk_builder_get_object(self->builder, "auth-dialog"));
+
+    gint result=gtk_dialog_run(GTK_DIALOG(dialog));
+
+//    g_object_ref(dialog);
+    gtk_widget_hide(dialog);
+//    g_object_unref(dialog);
+
+}
+
+
 void cc_loging_winer_clean(CCLogingWin * self)
 /**
  * clean *builder ,*winer
@@ -288,6 +305,7 @@ void cc_loging_winer_setup(CCLogingWin * self)
 
     GtkWidget *but_view =
 	GTK_WIDGET(gtk_builder_get_object(builder, "but_view"));
+    gtk_widget_set_name(but_view,"vm-viewer");
     g_critical("but_view:%x", but_view);
     GtkWidget *but_back =
 	GTK_WIDGET(gtk_builder_get_object(builder, "but_back"));
@@ -305,6 +323,11 @@ void cc_loging_winer_setup(CCLogingWin * self)
 	GTK_WIDGET(gtk_builder_get_object(builder, "but_refresh"));
     gtk_widget_set_name(but_refresh,"vm-refresh");
 
+    GtkWidget *infolabel =
+	GTK_WIDGET(gtk_builder_get_object(builder, "infolabel"));
+
+    GtkWidget *statusbar =
+	GTK_WIDGET(gtk_builder_get_object(builder, "statusbar"));
 
     self->winers = winer_widgets_new();
 
@@ -314,11 +337,12 @@ void cc_loging_winer_setup(CCLogingWin * self)
     self->winers->but_shutdown = but_down;
     self->winers->but_kill = but_kill;
     self->winers->but_refresh = but_refresh;
-
+    self->winers->infolabel = infolabel;
+    self->winers->statusbar = statusbar;
 
 
     g_signal_connect(G_OBJECT(but_view), "button_press_event",
-		     G_CALLBACK(cc_loging_winer_console_cb), self);
+		     G_CALLBACK(cc_loging_winer_view_cb), self);
 
     g_signal_connect(G_OBJECT(but_back), "clicked",
 		     G_CALLBACK(cc_loging_winer_goback_cb), self);
@@ -336,7 +360,7 @@ void cc_loging_winer_setup(CCLogingWin * self)
 
 
     cc_style_setup();
-
+//    cc_class_set(but_view,"down");
 
     g_print("====in Winer Setup===\n");
     cc_link_info_print(glink);
@@ -482,8 +506,11 @@ static void cc_loging_win_button_login_cb(GtkWidget * widget,
     g_free(domain);
     gboolean au=cc_loging_authorize(win);
 
-    if(!au)
+    if(!au){
+
+        auth_dialog_error(win);
         return;
+    }
 
     cc_loging_winer_setup(win);
     cc_loging_win_clean(win);
@@ -561,6 +588,8 @@ void cc_loging_win_setup(CCLogingWin * self)
     GtkWidget *but_login =
 	GTK_WIDGET(gtk_builder_get_object(builder, "but_login"));
 
+    GtkStyleContext*context=gtk_widget_get_style_context(but_login);
+    gtk_style_context_add_class (context, "suggested-action");
 
     self->wins = win_widgets_new();
 

@@ -1,0 +1,110 @@
+
+#win{
+
+    background-image: url("../pics/wallpaper.png");
+
+}
+
+GtkButton#vm-viewer{
+    background-image: url("../pics/cc-down195.png");
+    border-radius:1px;
+    border:0px;
+    background-size : 198px 147px;
+//    background-position:center
+}
+GtkButton#vm-viewer:hover{
+//    background-position:0px 1px;
+    background-color:rgba(255,255,255,0.2);
+}
+GtkButton#vm-viewer:active{
+    background-position:0px 1px;
+}
+
+GtkButton{
+//    background-color:rgba(10,10,10,0.1);
+    background-color:rgba(255,255,255,0.1);
+}
+
+
+
+
+
+GtkButton#winback{
+    background-image: url("../pics/cc-winback1.png");
+//    background-position:center;
+    border:0px;
+    background-size:44px 300px;
+}
+GtkButton#winback:hover{
+    background-position:-1px 0px;
+}
+GtkButton#winback:active{
+    background-position:-2px 0px;
+}
+
+
+
+
+
+GtkButton#vm-start{
+    background-image: url("../pics/cc-cstart50.png");
+//background-position:center;
+    border:0px;
+    border-radius:0px;
+    background-size:50px 50px;
+}
+
+GtkButton#vm-start:hover{
+    background-position:0px 1px;
+}
+GtkButton#vm-start:active{
+    background-position:-1px 2px;
+}
+
+GtkButton#vm-stop{
+    background-image: url("../pics/cc-cstop50.png");
+//    background-position:center;
+    border:0px;
+    border-radius:0px;
+    background-size:50px 50px;
+}
+
+GtkButton#vm-stop:hover{
+    background-position:0px 1px;
+}
+GtkButton#vm-stop:active{
+    background-position:-1px 2px;
+}
+
+
+GtkButton#vm-kill{
+    background-image: url("../pics/cc-ckill50.png");
+//    background-position:center;
+    border:0px;
+    border-radius:0px;
+    background-size:50px 50px;
+}
+
+GtkButton#vm-kill:hover{
+    background-position:0px 1px;
+}
+GtkButton#vm-kill:active{
+    background-position:-1px 2px;
+}
+
+
+GtkButton#vm-refresh{
+    background-image: url("../pics/cc-crefresh50.png");
+//    background-position:center;
+    border:0px;
+    border-radius:0px;
+    background-size:50px 50px;
+}
+
+GtkButton#vm-refresh:hover{
+    background-position:0px 1px;
+}
+GtkButton#vm-refresh:active{
+    background-position:-1px 2px;
+}
+

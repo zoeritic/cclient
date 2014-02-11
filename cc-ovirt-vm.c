@@ -167,7 +167,7 @@ static gboolean
 cb_get_domain_err_watch(GIOChannel * channel, GIOCondition cond,
 			CCOvirtVM * ovm)
 {
-    gboolean need_leave = FALSE;
+//    gboolean need_leave = FALSE;
     static int out_cnt;
     out_cnt++;
 
@@ -177,6 +177,7 @@ cb_get_domain_err_watch(GIOChannel * channel, GIOCondition cond,
     if (cond & G_IO_HUP) {
 	g_print("---->>:G_IO_HUP::err\n");
 	g_io_channel_unref(channel);
+    g_warning("g_io unrefed..");
 	return FALSE;
 //    g_io_channel_shutdown(channel,TRUE,NULL);
 //      need_leave = TRUE;
@@ -189,8 +190,8 @@ cb_get_domain_err_watch(GIOChannel * channel, GIOCondition cond,
 //    domain_get_ok = FALSE;
 
     g_print("err_watch\n");
-//    g_io_channel_read_to_end(channel, &string, &size, NULL);
-    g_io_channel_read_line(channel, &string, &size, NULL, NULL);
+    g_io_channel_read_to_end(channel, &string, &size, NULL);
+//    g_io_channel_read_line(channel, &string, &size, NULL, NULL);
     if (NULL == ovm->strerr) {
 	ovm->strerr = g_string_new("");
     }
@@ -199,7 +200,7 @@ cb_get_domain_err_watch(GIOChannel * channel, GIOCondition cond,
 //g_print("=++++++++++++++\n");
     g_print("serrr::]%s[\n", ovm->strerr->str);
 
-    if (string)
+//    if (string)
 	g_free(string);
 //    if (need_leave) {
 //      g_io_channel_unref(channel);
@@ -227,12 +228,17 @@ static void cb_get_domain_child_watch(GPid pid, gint status,
     */
 
     if (NULL != ovm->strerr) {
-	serr = g_strstrip(g_string_free(ovm->strerr, FALSE));
+	serr = g_string_free(ovm->strerr, FALSE);
 	ovm->strerr = NULL;
 	g_message("STRERR::\n%s", serr);
-	ovm->strerr = NULL;
+//	ovm->strerr = NULL;
 //        g_free(serr);
+    }else{
+    /*nothing has been read from stderr*/
+    serr=g_strdup("DOMAIN-UNKNOW");
+    /*elimate SIGSEGV fault when serr==NULL*/
     }
+
     if (NULL == strstr(serr, "DOMAIN-OK")) {
 	domain_get_ok = FALSE;
     } else {
@@ -247,7 +253,7 @@ static void cb_get_domain_child_watch(GPid pid, gint status,
     if (domain_get_ok) {
 	g_message("Get Domain Successfully.");
 	g_source_remove(ovm->timeout_id);
-
+gdk_threads_enter();
 	GtkWidget *combo_domain = ovm->win->wins->combo_domain;	// data->combo_domain;
 	GtkWidget *but_login = ovm->win->wins->login;	//data->widget;
 	gtk_combo_box_text_remove(GTK_COMBO_BOX_TEXT(combo_domain), 0);
@@ -256,6 +262,8 @@ static void cb_get_domain_child_watch(GPid pid, gint status,
 	gtk_combo_box_set_active(GTK_COMBO_BOX(combo_domain), 0);
 	gtk_widget_set_sensitive(combo_domain, TRUE);
 	gtk_widget_set_sensitive(but_login, TRUE);
+
+    gdk_threads_leave();
 
 #ifdef GET_DOMAIN_ONCE
 	domain_getten = TRUE;
@@ -271,12 +279,12 @@ static void cb_get_domain_child_watch(GPid pid, gint status,
 //      spawn_async_get_domain(ovm);
 
     }
-//    g_message("[[[[[[");
+    g_message("[[[[[[");
     if (sout != NULL)
 	g_free(sout);
     if (serr != NULL)
 	g_free(serr);
-//    g_message("]]]]]");
+    g_message("]]]]]");
 
 
 /* Close pid */
@@ -296,17 +304,19 @@ static gboolean timeout_getdomain_cb(CCOvirtVM * ovm)
 //        
 //   }
 
-//    gdk_threads_enter();
     g_message("Timeout get domain ...");
     /* Bounce progress bar */
     GtkWidget *combo_domain = ovm->win->wins->combo_domain;	//data->combo_domain;
 
+    gdk_threads_enter();
+    g_message("in Timeout get domain[GDK enter] ...");
     gtk_combo_box_text_remove(GTK_COMBO_BOX_TEXT(combo_domain), 0);
     gtk_combo_box_text_insert_text(GTK_COMBO_BOX_TEXT(combo_domain), 0,
 				   pulse_c[pulse]);
     gtk_combo_box_set_active(GTK_COMBO_BOX(combo_domain), 0);
     pulse = (pulse + 1) % 5;
-//gdk_threads_leave();
+gdk_threads_leave();
+    g_message("in Timeout get domain[GDK leave] ...");
 
     return (TRUE);
 }
@@ -349,7 +359,7 @@ static gboolean spawn_async_get_domain(CCOvirtVM * ovm)
 		      ovm);
 
     /* Create channels that will be used to read data from pipes. */
-    out_ch = g_io_channel_unix_new(out);
+//    out_ch = g_io_channel_unix_new(out);
     err_ch = g_io_channel_unix_new(err);
     /*configure channels */
 /*
@@ -804,13 +814,13 @@ static void vm_child_watch(GPid pid, gint status, CCOvirtVM * ovm)
 	    g_print("in child watch {vm_stat_ok}..\n");
 	    GtkWidget *viewer = ovm->win->winers->but_view;	// data->combo_domain;
 	    if (!strcmp(sout, "up")) {
-		gtk_widget_set_sensitive(viewer, TRUE);
         cc_set_css(viewer,STYLE_PATH "viewer-up.css");
+		gtk_widget_set_sensitive(viewer, TRUE);
 //        cc_class_set(viewer,"up");
 //        gtk_widget_set_name(viewer,"")
 	    } else {
-		gtk_widget_set_sensitive(viewer, FALSE);
         cc_set_css(viewer,STYLE_PATH "viewer-down.css");
+		gtk_widget_set_sensitive(viewer, FALSE);
 //        cc_class_set(viewer,"down");
 	    }
         set_statusbar(ovm,"");

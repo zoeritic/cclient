@@ -2,7 +2,7 @@
 #define __CC_CONFIG_
 
 #define STYLE_PATH "./style/"
-#define STATUS_ICON "cclient.png"
+#define STATUS_ICON "./pics/cclient.png"
 
 #define LINK_NAME_SIZE 32
 #define RESTOVIRT_DIR "./rest-ovirt/"

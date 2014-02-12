@@ -245,7 +245,7 @@ static void cb_get_domain_child_watch(GPid pid, gint status,
 //        g_free(serr);
     }else{
     /*nothing has been read from stderr*/
-    serr=g_strdup("DOMAIN-UNKNOW");
+    serr=g_strdup("DOMAIN-UNKNOW:need retry");
     /*elimate SIGSEGV fault when serr==NULL*/
     }
 
@@ -521,6 +521,10 @@ static void cb_stat_vm_child_watch(GPid pid, gint status, CCOvirtVM * ovm)
 //        g_free(serr);
 	sout = cc_get_state(serr);
 
+    }else{
+    
+    serr=strdup("STAT-UNKNOWN:need re try");
+    
     }
 
     g_print("vm_stat_child_watch\n");
@@ -546,7 +550,8 @@ static void cb_stat_vm_child_watch(GPid pid, gint status, CCOvirtVM * ovm)
 		gtk_widget_set_sensitive((ovm->win->winers->but_start), FALSE);
 		gtk_widget_set_sensitive((ovm->win->winers->but_shutdown), TRUE);
 		gtk_widget_set_sensitive((ovm->win->winers->but_kill), TRUE);
-
+        
+        cc_set_css(viewer,STYLE_PATH "viewer-up.css");
         gtk_widget_set_tooltip_text(viewer,"双击进入Windows");
 
 	    } else {		// if(!strcmp(vm_stat_expect,"down")){
@@ -555,6 +560,7 @@ static void cb_stat_vm_child_watch(GPid pid, gint status, CCOvirtVM * ovm)
 		gtk_widget_set_sensitive((ovm->win->winers->but_shutdown), FALSE);
 		gtk_widget_set_sensitive((ovm->win->winers->but_kill), FALSE);
 
+        cc_set_css(viewer,STYLE_PATH "viewer-down.css");
         gtk_widget_set_tooltip_text(viewer,"请先启动Windows");
 	    }
 	} else if (vm_stating_cnt >= STATING_TIMEOUT_MAX) {
@@ -809,6 +815,10 @@ static void vm_child_watch(GPid pid, gint status, CCOvirtVM * ovm)
 	ovm->strerr = NULL;
 	g_message("STRERR::\n%s", serr);
 //        g_free(err);
+    }else{
+    
+        serr=g_strdup("OPER-UNKNOWN:need re try");
+    
     }
     if (NULL == strstr(serr, "OPER-OK")) {
 	*ovm->op = FALSE;

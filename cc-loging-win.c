@@ -160,6 +160,20 @@ static gboolean cc_loging_authorize(CCLogingWin *win)
 }
 
 
+static void cc_winer_tooltip_set(CCLogingWin*win)
+{
+    gtk_widget_set_tooltip_text(win->winers->but_view,"");
+    gtk_widget_set_tooltip_text(win->winers->but_start,"启动Windows");
+    gtk_widget_set_tooltip_text(win->winers->but_shutdown,"关闭Windows");
+    gtk_widget_set_tooltip_text(win->winers->but_kill,"强制关闭Windows");
+    gtk_widget_set_tooltip_text(win->winers->but_refresh,"刷新Windows状态");
+
+
+
+}
+
+
+
 
 static void cc_loging_winer_goback_cb(GtkWidget * widget,
 				      CCLogingWin * logingwin)
@@ -360,6 +374,7 @@ void cc_loging_winer_setup(CCLogingWin * self)
 
     cc_style_setup();
 //    cc_class_set(but_view,"down");
+cc_winer_tooltip_set(self);
 
     g_print("====in Winer Setup===\n");
     cc_link_info_print(glink);

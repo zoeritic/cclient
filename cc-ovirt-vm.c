@@ -190,7 +190,17 @@ cb_get_domain_err_watch(GIOChannel * channel, GIOCondition cond,
 //    domain_get_ok = FALSE;
 
     g_print("err_watch\n");
-    g_io_channel_read_to_end(channel, &string, &size, NULL);
+    GIOStatus s=g_io_channel_read_to_end(channel, &string, &size, NULL);
+    if(s==G_IO_STATUS_EOF){
+        g_warning("G_IO_STATUX_EOF");
+    }else if(s==G_IO_STATUS_ERROR){
+        g_warning("G_IO_STATUX_ERROR");
+    }else if(s==G_IO_STATUS_AGAIN){
+        g_warning("G_IO_STATUX_AGAIN");
+    }else{
+        g_warning("G_IO_STATUX_NNNN");
+    
+    }
 //    g_io_channel_read_line(channel, &string, &size, NULL, NULL);
     if (NULL == ovm->strerr) {
 	ovm->strerr = g_string_new("");
@@ -533,14 +543,23 @@ static void cb_stat_vm_child_watch(GPid pid, gint status, CCOvirtVM * ovm)
 	if (!g_strcmp0(sout, vm_stat_expect)) {
 	    if (!strcmp(vm_stat_expect, "up")) {
 		gtk_widget_set_sensitive((viewer), TRUE);
+		gtk_widget_set_sensitive((ovm->win->winers->but_start), FALSE);
+		gtk_widget_set_sensitive((ovm->win->winers->but_shutdown), TRUE);
+		gtk_widget_set_sensitive((ovm->win->winers->but_kill), TRUE);
+
+        gtk_widget_set_tooltip_text(viewer,"双击进入Windows");
 
 	    } else {		// if(!strcmp(vm_stat_expect,"down")){
 		gtk_widget_set_sensitive((viewer), FALSE);
+		gtk_widget_set_sensitive((ovm->win->winers->but_start), TRUE);
+		gtk_widget_set_sensitive((ovm->win->winers->but_shutdown), FALSE);
+		gtk_widget_set_sensitive((ovm->win->winers->but_kill), FALSE);
 
+        gtk_widget_set_tooltip_text(viewer,"请先启动Windows");
 	    }
 	} else if (vm_stating_cnt >= STATING_TIMEOUT_MAX) {
 	    g_critical("VM Stating counter Ran out");
-	    gtk_widget_set_sensitive((viewer), FALSE);
+//	    gtk_widget_set_sensitive((viewer), FALSE);
 	}
 
 	cc_ovirt_vm_purge(ovm);
@@ -816,11 +835,21 @@ static void vm_child_watch(GPid pid, gint status, CCOvirtVM * ovm)
 	    if (!strcmp(sout, "up")) {
         cc_set_css(viewer,STYLE_PATH "viewer-up.css");
 		gtk_widget_set_sensitive(viewer, TRUE);
+		gtk_widget_set_sensitive((ovm->win->winers->but_start), FALSE);
+		gtk_widget_set_sensitive((ovm->win->winers->but_shutdown), TRUE);
+		gtk_widget_set_sensitive((ovm->win->winers->but_kill), TRUE);
+
+        gtk_widget_set_tooltip_text(viewer,"双击进入Windows");
 //        cc_class_set(viewer,"up");
 //        gtk_widget_set_name(viewer,"")
 	    } else {
         cc_set_css(viewer,STYLE_PATH "viewer-down.css");
 		gtk_widget_set_sensitive(viewer, FALSE);
+		gtk_widget_set_sensitive((ovm->win->winers->but_start), TRUE);
+		gtk_widget_set_sensitive((ovm->win->winers->but_shutdown), FALSE);
+		gtk_widget_set_sensitive((ovm->win->winers->but_kill), FALSE);
+
+        gtk_widget_set_tooltip_text(viewer,"请先启动Windows");
 //        cc_class_set(viewer,"down");
 	    }
         set_statusbar(ovm,"");

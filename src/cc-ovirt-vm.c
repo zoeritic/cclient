@@ -4,12 +4,12 @@
 #include"cc-loging-ovirt.h"
 #include"config.h"
 
-#define OVIRT_VMOPER "./rest-ovirt/vm-helper.py"
+//#define OVIRT_VMOPER "./rest-ovirt/vm-helper.py"
 
 //#define TIMEOUT_COUNT_LIMIT 10
 //static guint timeout_ct = 0;
 
-#define STATING_TIMEOUT_MAX 15
+//#define STATING_TIMEOUT_MAX 15
 
 
 static gboolean domain_get_ok = TRUE;
@@ -125,7 +125,7 @@ static gboolean
 cb_get_domain_out_watch(GIOChannel * channel, GIOCondition cond,
 			CCOvirtVM * ovm)
 {
-    gboolean need_leave = FALSE;
+//    gboolean need_leave = FALSE;
     static int out_cnt;
     out_cnt++;
     g_critical("Callback get domain OUT watch");
@@ -263,7 +263,8 @@ static void cb_get_domain_child_watch(GPid pid, gint status,
     if (domain_get_ok) {
 	g_message("Get Domain Successfully.");
 	g_source_remove(ovm->timeout_id);
-gdk_threads_enter();
+
+    //gdk_threads_enter();
 	GtkWidget *combo_domain = ovm->win->wins->combo_domain;	// data->combo_domain;
 	GtkWidget *but_login = ovm->win->wins->login;	//data->widget;
 	gtk_combo_box_text_remove(GTK_COMBO_BOX_TEXT(combo_domain), 0);
@@ -272,8 +273,7 @@ gdk_threads_enter();
 	gtk_combo_box_set_active(GTK_COMBO_BOX(combo_domain), 0);
 	gtk_widget_set_sensitive(combo_domain, TRUE);
 	gtk_widget_set_sensitive(but_login, TRUE);
-
-    gdk_threads_leave();
+    //gdk_threads_leave();
 
 #ifdef GET_DOMAIN_ONCE
 	domain_getten = TRUE;
@@ -298,7 +298,7 @@ gdk_threads_enter();
 
 
 /* Close pid */
-    g_message("About to close PID");
+//    g_message("About to close PID");
     g_spawn_close_pid(pid);
     g_message("PID closed");
 
@@ -318,15 +318,15 @@ static gboolean timeout_getdomain_cb(CCOvirtVM * ovm)
     /* Bounce progress bar */
     GtkWidget *combo_domain = ovm->win->wins->combo_domain;	//data->combo_domain;
 
-    gdk_threads_enter();
-    g_message("in Timeout get domain[GDK enter] ...");
+//  gdk_threads_enter();
+//    g_message("in Timeout get domain[GDK enter] ...");
     gtk_combo_box_text_remove(GTK_COMBO_BOX_TEXT(combo_domain), 0);
     gtk_combo_box_text_insert_text(GTK_COMBO_BOX_TEXT(combo_domain), 0,
 				   pulse_c[pulse]);
     gtk_combo_box_set_active(GTK_COMBO_BOX(combo_domain), 0);
     pulse = (pulse + 1) % 5;
-gdk_threads_leave();
-    g_message("in Timeout get domain[GDK leave] ...");
+//  gdk_threads_leave();
+//    g_message("in Timeout get domain[GDK leave] ...");
 
     return (TRUE);
 }
@@ -341,7 +341,7 @@ static gboolean spawn_async_get_domain(CCOvirtVM * ovm)
     g_message("Spawn get domain....");
     GPid pid;
     gchar *argv[] =
-	{ "./rest-ovirt/vm-getdomain.py", ovm->win->ovirt->maddr,
+	{ OVIRT_GETDOMAIN, ovm->win->ovirt->maddr,
 	NULL
     };
 
@@ -553,7 +553,7 @@ static void cb_stat_vm_child_watch(GPid pid, gint status, CCOvirtVM * ovm)
 		gtk_widget_set_sensitive((ovm->win->winers->but_shutdown), TRUE);
 		gtk_widget_set_sensitive((ovm->win->winers->but_kill), TRUE);
         
-        cc_set_css(viewer,STYLE_PATH "viewer-up.css");
+        cc_set_css(viewer,STYLE_UP);
         gtk_widget_set_tooltip_text(viewer,"双击进入Windows");
 
 	    } else {		// if(!strcmp(vm_stat_expect,"down")){
@@ -562,7 +562,7 @@ static void cb_stat_vm_child_watch(GPid pid, gint status, CCOvirtVM * ovm)
 		gtk_widget_set_sensitive((ovm->win->winers->but_shutdown), FALSE);
 		gtk_widget_set_sensitive((ovm->win->winers->but_kill), FALSE);
 
-        cc_set_css(viewer,STYLE_PATH "viewer-down.css");
+        cc_set_css(viewer,STYLE_DOWN);
         gtk_widget_set_tooltip_text(viewer,"请先启动Windows");
 	    }
 	} else if (vm_stating_cnt >= STATING_TIMEOUT_MAX) {
@@ -581,7 +581,7 @@ static void cb_stat_vm_child_watch(GPid pid, gint status, CCOvirtVM * ovm)
 	g_warning("VM State doesn't meet Expected !Will retry latter..");
 
 	vm_stating_cnt++;
-	spawn_async_stat_vm_with_delay(ovm, REQUEST_INTERVAL);
+	spawn_async_stat_vm_with_delay(ovm, STATING_INTERVAL);
 
 
     }
@@ -718,7 +718,7 @@ void cc_ovirt_stating_vm_r(CCOvirtVM * ovm)
 
     pulse = 0;
 
-    gchar *argv[] = { "./rest-ovirt/vm-stat.py", ovm->win->ovirt->maddr,
+    gchar *argv[] = { OVIRT_STAT, ovm->win->ovirt->maddr,
 	ovm->win->ovirt->vmname, NULL
     };
 
@@ -845,7 +845,7 @@ static void vm_child_watch(GPid pid, gint status, CCOvirtVM * ovm)
 	    g_print("in child watch {vm_stat_ok}..\n");
 	    GtkWidget *viewer = ovm->win->winers->but_view;	// data->combo_domain;
 	    if (!strcmp(sout, "up")) {
-        cc_set_css(viewer,STYLE_PATH "viewer-up.css");
+        cc_set_css(viewer,STYLE_UP );
 		gtk_widget_set_sensitive(viewer, TRUE);
 		gtk_widget_set_sensitive((ovm->win->winers->but_start), FALSE);
 		gtk_widget_set_sensitive((ovm->win->winers->but_shutdown), TRUE);
@@ -855,7 +855,7 @@ static void vm_child_watch(GPid pid, gint status, CCOvirtVM * ovm)
 //        cc_class_set(viewer,"up");
 //        gtk_widget_set_name(viewer,"")
 	    } else {
-        cc_set_css(viewer,STYLE_PATH "viewer-down.css");
+        cc_set_css(viewer,STYLE_DOWN);
 		gtk_widget_set_sensitive(viewer, FALSE);
 		gtk_widget_set_sensitive((ovm->win->winers->but_start), TRUE);
 		gtk_widget_set_sensitive((ovm->win->winers->but_shutdown), FALSE);
@@ -1003,7 +1003,7 @@ void cc_ovirt_vm_start_r(CCOvirtVM * ovm)	//, CCLogingWin * w)
     vm_start_ok = TRUE;
 
     gchar *argv[] =
-	{ "./rest-ovirt/vm-oper.py", "-l", ovm->win->ovirt->maddr,
+	{ OVIRT_OPER, "-l", ovm->win->ovirt->maddr,
 	"-U", ovm->win->ovirt->vmname, NULL
     };
 
@@ -1028,7 +1028,7 @@ void cc_ovirt_vm_shutdown_r(CCOvirtVM * ovm)	//, CCLogingWin * w)
     vm_stop_ok = TRUE;
 
     gchar *argv[] =
-	{ "./rest-ovirt/vm-oper.py", "-l", ovm->win->ovirt->maddr,
+	{ OVIRT_OPER, "-l", ovm->win->ovirt->maddr,
 	"-D", ovm->win->ovirt->vmname, NULL
     };
 
@@ -1054,7 +1054,7 @@ void cc_ovirt_vm_kill_r(CCOvirtVM * ovm)	//, CCLogingWin * w)
     vm_kill_ok = TRUE;
 
     gchar *argv[] =
-	{ "./rest-ovirt/vm-oper.py", "-l", ovm->win->ovirt->maddr, "-K",
+	{ OVIRT_OPER, "-l", ovm->win->ovirt->maddr, "-K",
 	ovm->win->ovirt->vmname, NULL
     };
 
@@ -1079,7 +1079,7 @@ void cc_ovirt_vm_stat_r(CCOvirtVM * ovm)	//, CCLogingWin * w)
     }
     vm_stat_ok = TRUE;
 
-    gchar *argv[] = { "./rest-ovirt/vm-stat.py", ovm->win->ovirt->maddr,
+    gchar *argv[] = { OVIRT_OPER, ovm->win->ovirt->maddr,
 	ovm->win->ovirt->vmname, NULL
     };
 
@@ -1097,7 +1097,7 @@ void cc_ovirt_vm_stat_r(CCOvirtVM * ovm)	//, CCLogingWin * w)
 void cc_ovirt_vm_stat_sync(CCOvirtVM * ovm)
 {
 
-    gchar *cmd = g_strdup_printf("./rest-ovirt/vm-stat.py %s %s",
+    gchar *cmd = g_strdup_printf(OVIRT_STAT" %s %s",
 				 ovm->win->ovirt->maddr,
 				 ovm->win->ovirt->vmname);
     gchar *out, *err;
@@ -1148,7 +1148,7 @@ void cc_ovirt_vm_viewer(CCOvirtVM * ovm)
 
     vm_view_ok = TRUE;
 
-    gchar *argv[] = { "./rest-ovirt/vm-viewer.py", ovm->win->ovirt->maddr,
+    gchar *argv[] = { OVIRT_VIEWER, ovm->win->ovirt->maddr,
 	ovm->win->ovirt->vmname,
 	ovm->win->ovirt->user, ovm->win->ovirt->passwd,
 	NULL
@@ -1172,7 +1172,7 @@ void cc_ovirt_vm_viewer_2(CCOvirtVM*ovm)
 
     vm_view_ok = TRUE;
 
-    gchar *argv[] = { "./rest-ovirt/vm-viewer.py", ovm->win->ovirt->maddr,
+    gchar *argv[] = { OVIRT_VIEWER, ovm->win->ovirt->maddr,
 	ovm->win->ovirt->vmname,
 	ovm->win->ovirt->passwd,
 	NULL

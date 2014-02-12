@@ -1,4 +1,5 @@
 #include<gtk/gtk.h>
+#include"cc-style.h"
 #include"config.h"
 //#define STYLE_PATH "./style/"
 

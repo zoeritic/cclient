@@ -8,7 +8,7 @@
 //#include"cc-loging-ovirt.h"
 
 //#define TIMEOUT_INTERVAL 1
-//#define REQUEST_INTERVAL 5
+//#define STATING_INTERVAL 5
 //#define GETDOMAIN_INTERVAL 5
 
 

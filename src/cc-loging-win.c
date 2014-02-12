@@ -130,7 +130,7 @@ static gboolean cc_loging_authorize(CCLogingWin *win)
 {
 
     gboolean rtval=FALSE;
-    gchar* cmd=g_strdup_printf("./rest-ovirt/vm-auth.py %s %s %s",
+    gchar* cmd=g_strdup_printf(OVIRT_AUTH " %s %s %s",
             glink->addr,
             win->info->user,
             win->info->passwd);

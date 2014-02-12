@@ -336,6 +336,8 @@ static gboolean spawn_async_get_domain(CCOvirtVM * ovm)
 {
     domain_get_ok = TRUE;
 
+    cc_ovirt_info_update(ovm->win->ovirt,ovm->win->info,glink);
+
     g_message("Spawn get domain....");
     GPid pid;
     gchar *argv[] =

@@ -9,18 +9,18 @@
 
 #define STATUS_ICON "../pics/cclient.png"
 
-#define RESTOVIRT_DIR "../rest-ovirt/"
+#define RESTOVIRT_DIR "../rest-ovirt"
 #define UI_LOGING_WIN "../ui/cc-loging-win.ui"
 #define UI_LOGING_WINER "../ui/cc-loging-winer.ui"
 
 #define UI_MPANEL "../ui/cc-manager-panel.ui"
 //#define OVIRT_VMOPER "../rest-ovirt/vm-helper.py"
 
-#define OVIRT_AUTH "../rest-ovirt/vm-auth.py"
-#define OVIRT_GETDOMAIN "../rest-ovirt/vm-getdomain.py"
-#define OVIRT_STAT "../rest-ovirt/vm-stat.py"
-#define OVIRT_OPER "../rest-ovirt/vm-oper.py"
-#define OVIRT_VIEWER "../rest-ovirt/vm-viewer.py"
+#define OVIRT_AUTH RESTOVIRT_DIR"/vm-auth.py"
+#define OVIRT_GETDOMAIN RESTOVIRT_DIR"/vm-getdomain.py"
+#define OVIRT_STAT RESTOVIRT_DIR"/vm-stat.py"
+#define OVIRT_OPER RESTOVIRT_DIR"/vm-oper.py"
+#define OVIRT_VIEWER RESTOVIRT_DIR"/vm-viewer.py"
 
 
 

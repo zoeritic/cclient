@@ -25,7 +25,7 @@ class conf():
 
     FULL_SCREEN=True
 #    CONFIG_FILE='conf_vm_console.ini'
-    CERTS_DIR='rest-ovirt/.certs/'
+    CERTS_DIR='.certs/'
     PERM_PATH='~/.spicec/spice_truststore.pem'
 
     CONSOLE='spicy'
@@ -53,6 +53,7 @@ def get_ca_crt(Mipp):
     rt=os.system(syscmd)
     if rt!=0:
         print_err("Copy Cert_File Failed")
+#    os.system("mkdir -p ooooo")# "+conf.CERTS_DIR)
     print_ok("certification saved in [%s]"%crt_file)
     return crt_file
 

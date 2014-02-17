@@ -358,7 +358,7 @@ static gboolean spawn_async_get_domain(CCOvirtVM * ovm)
     gboolean ret;
 
     /* Spawn child process */
-    ret = g_spawn_async_with_pipes(NULL, argv, NULL,
+    ret = g_spawn_async_with_pipes(RESTOVIRT_DIR, argv, NULL,
 				   G_SPAWN_DO_NOT_REAP_CHILD, NULL,
 				   NULL, &pid, NULL, &out, &err, NULL);
     if (!ret) {
@@ -656,7 +656,7 @@ NULL };
     gboolean ret;
 
     /* Spawn child process */
-    ret = g_spawn_async_with_pipes(NULL, argv, NULL,
+    ret = g_spawn_async_with_pipes(RESTOVIRT_DIR, argv, NULL,
 				   G_SPAWN_DO_NOT_REAP_CHILD, NULL,
 				   NULL, &pid, NULL, &out, &err, NULL);
     if (!ret) {
@@ -913,8 +913,8 @@ static void vm_child_watch(GPid pid, gint status, CCOvirtVM * ovm)
 
     } else {			//operation on VM failed!!
 
-    set_statusbar(ovm,"");
-        g_warning("VM's operation Failed!!");
+    set_statusbar(ovm,"操作失败，或重试");
+        g_warning("VM's Operation Failed!!");
 
 	//TODO
 
@@ -954,7 +954,7 @@ static void spawn_async_vm(CCOvirtVM * ovm)
     /* Install timeout fnction that will move the progress bar */
 // data->timeout_id = g_timeout_add( 1000, (GSourceFunc)cb_timeout, data );
     /* Spawn child process */
-    ret = g_spawn_async_with_pipes(NULL, argv, NULL,
+    ret = g_spawn_async_with_pipes(RESTOVIRT_DIR, argv, NULL,
 				   G_SPAWN_DO_NOT_REAP_CHILD, NULL,
 				   NULL, &pid, NULL, &out, &err, NULL);
     if (!ret) {
@@ -1079,7 +1079,7 @@ void cc_ovirt_vm_stat_r(CCOvirtVM * ovm)	//, CCLogingWin * w)
     }
     vm_stat_ok = TRUE;
 
-    gchar *argv[] = { OVIRT_OPER, ovm->win->ovirt->maddr,
+    gchar *argv[] = { OVIRT_STAT, ovm->win->ovirt->maddr,
 	ovm->win->ovirt->vmname, NULL
     };
 
@@ -1182,7 +1182,7 @@ void cc_ovirt_vm_viewer_2(CCOvirtVM*ovm)
 //    ovm->op = &vm_view_ok;
 //    GPid pid;
     gint st;
-    gboolean rv=g_spawn_sync(NULL,argv,NULL,0,NULL,NULL,NULL,NULL,&st,NULL);
+    gboolean rv=g_spawn_sync(RESTOVIRT_DIR,argv,NULL,0,NULL,NULL,NULL,NULL,&st,NULL);
 
 
 }

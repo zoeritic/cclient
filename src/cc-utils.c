@@ -102,7 +102,7 @@ gchar *cc_get_port_from_fullurl(gchar * url)
 
 
 
-
+/*get status from stderr output of subprocess*/
 gchar* cc_get_state(gchar* ss)
 {
 

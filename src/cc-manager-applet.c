@@ -223,7 +223,7 @@ static void ccma_dialog_response_cb(GtkDialog * dialog, gint res,
 
 static GtkWidget *ccma_confirm_dialog_new(CCManagerApplet * applet)
 {
-    g_message(" Entering ccma_confirm_dialog_new()..");
+    g_message(" ccma_confirm_dialog_new()..");
     GtkWidget *dialog, *label, *entry, *box, *bt_ok, *bt_cancel;
     if (CC_MANAGERAPPLET(applet)->is_confirm_showed == TRUE)
 	return NULL;
@@ -263,16 +263,7 @@ static GtkWidget *ccma_confirm_dialog_new(CCManagerApplet * applet)
 		     G_CALLBACK(ccma_dialog_response_cb), applet);
     gtk_window_set_position(GTK_WINDOW(dialog), GTK_WIN_POS_CENTER_ALWAYS);
     gtk_window_set_keep_above(GTK_WINDOW(dialog), TRUE);
-//    gtk_widget_realize(dialog);
-//    gtk_window_present(GTK_WINDOW(dialog));
 
-//    g_message(" Entering ccma_confirm_dialog_new(1)..");
-//    GtkWindow *bwin =
-//	GTK_WINDOW(gtk_builder_get_object(applet->loging_win->builder, "window"));
-//    g_message(" Entering ccma_confirm_dialog_new(2)..");
-
-//    gtk_window_set_transient_for(GTK_WINDOW(dialog), bwin);
-//    gtk_window_set_modal(GTK_WINDOW(dialog), TRUE);
     g_message("ccma_confirm_dialog_new()..");
     gtk_widget_show_all(dialog);
     return dialog;

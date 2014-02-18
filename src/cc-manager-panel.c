@@ -261,7 +261,12 @@ void cc_mpanel_setup(CCMPanel * self)
 
 void cc_mpanel_init(CCMPanel * self)
 {
-    self->builder = gtk_builder_new_from_file(UI_MPANEL);
+    if(GTK_CHECK_VERSION(3.10.0)){
+        self->builder=gtk_builder_new_from_file(UI_MPANEL);
+    }else{
+    self->builder=gtk_builder_new();
+    gtk_builder_new_from_file(self->builder,UI_MPANEL,NULL);
+    }
 }
 
 void cc_mpanel_class_init(CCMPanelClass * klass)

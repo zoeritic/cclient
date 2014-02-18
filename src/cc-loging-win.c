@@ -309,7 +309,7 @@ void cc_loging_winer_setup(CCLogingWin * self)
     }
 
 
-    if(GTK_CHECK_VERSION(3.10.0)){
+    if(GTK_CHECK_VERSION(3,10,0)){
         self->builder=gtk_builder_new_from_file(UI_LOGING_WINER);
     }else{
     self->builder=gtk_builder_new();
@@ -590,7 +590,7 @@ void cc_loging_win_setup(CCLogingWin * self)
 //    if(self->win){}
 
 //    g_message("enter win setup-1");
-    if(GTK_CHECK_VERSION(3.10.0)){
+    if(GTK_CHECK_VERSION(3,10,0)){
         self->builder=gtk_builder_new_from_file(UI_LOGING_WIN);
     }else{
     self->builder=gtk_builder_new();

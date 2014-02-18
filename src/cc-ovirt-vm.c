@@ -525,7 +525,7 @@ static void cb_stat_vm_child_watch(GPid pid, gint status, CCOvirtVM * ovm)
 
     }else{
     
-    serr=strdup("STAT-UNKNOWN:need re try");
+    serr=g_strdup("STAT-UNKNOWN:need re try");
     
     }
 

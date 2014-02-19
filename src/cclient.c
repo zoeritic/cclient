@@ -9,6 +9,10 @@ static GMainLoop *loop = NULL;
 int main(int argc, char **argv)
 {
 
+int d=g_chdir(RUN_PATH);
+if(d!=0){
+	g_critical("Change director to [%s] !",RUN_PATH);
+}
 
     gtk_init(&argc, &argv);
 

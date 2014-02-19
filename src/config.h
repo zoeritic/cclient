@@ -1,6 +1,9 @@
 #ifndef __CC_CONFIG_
 #define __CC_CONFIG_
 
+
+#define RUN_PATH "/home/cclient/App/cclient/build"
+
 #define STYLE_PATH "../style/"
 #define STYLE STYLE_PATH"image.css"
 #define STYLE_UP   STYLE_PATH"viewer-up.css"

@@ -309,12 +309,12 @@ void cc_loging_winer_setup(CCLogingWin * self)
     }
 
 
-    if(GTK_CHECK_VERSION(3,10,0)){
-        self->builder=gtk_builder_new_from_file(UI_LOGING_WINER);
-    }else{
+//    if(GTK_CHECK_VERSION(3,10,0)){
+//        self->builder=gtk_builder_new_from_file(UI_LOGING_WINER);
+//    }else{
     self->builder=gtk_builder_new();
     gtk_builder_add_from_file(self->builder,UI_LOGING_WINER,NULL);
-    }
+//    }
 
     GtkBuilder *builder = self->builder;
     g_message("Winer Setup:Builder=%x ", builder);
@@ -387,9 +387,9 @@ cc_winer_tooltip_set(self);
     cc_link_info_print(glink);
     cc_loging_info_print(self->info);
     cc_ovirt_info_print(self->ovirt);
-/*
+
     gtk_window_maximize(GTK_WINDOW(winer));
-*/
+
     gtk_widget_grab_focus(winer);
     gtk_widget_show_all(winer);
 //get_vm_stat
@@ -590,12 +590,12 @@ void cc_loging_win_setup(CCLogingWin * self)
 //    if(self->win){}
 
 //    g_message("enter win setup-1");
-    if(GTK_CHECK_VERSION(3,10,0)){
-        self->builder=gtk_builder_new_from_file(UI_LOGING_WIN);
-    }else{
+//    if(GTK_CHECK_VERSION(3,10,0)){
+//        self->builder=gtk_builder_new_from_file(UI_LOGING_WIN);
+//    }else{
     self->builder=gtk_builder_new();
     gtk_builder_add_from_file(self->builder,UI_LOGING_WIN,NULL);
-    }
+//    }
 
     GtkBuilder *builder = self->builder;
     GtkWidget *win = GTK_WIDGET(gtk_builder_get_object(builder, "window"));
@@ -683,7 +683,7 @@ void cc_loging_win_setup(CCLogingWin * self)
 
     cc_style_setup();
 
-//    gtk_window_maximize(GTK_WINDOW(win));
+    gtk_window_maximize(GTK_WINDOW(win));
     gtk_window_set_position(GTK_WINDOW(win), GTK_WIN_POS_CENTER);
     gtk_widget_show_all(win);
 

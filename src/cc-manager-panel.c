@@ -77,7 +77,10 @@ static void spice_dialog_but_leave_cb(GtkWidget * widget, gpointer data)
 GtkWidget *cc_mpanel_spice_dialog_new(GtkWidget*parent)
 {
 
-    GtkBuilder *builder = gtk_builder_new_from_file(UI_MPANEL);
+GtkBuilder*builder=gtk_builder_new();
+gtk_builder_add_from_file(builder,UI_MPANEL,NULL);
+	
+//    GtkBuilder *builder = gtk_builder_new_from_file(UI_MPANEL);
     if (builder == NULL) {
 	g_error("Loading UI [%s]", UI_MPANEL);
     }
@@ -261,12 +264,12 @@ void cc_mpanel_setup(CCMPanel * self)
 
 void cc_mpanel_init(CCMPanel * self)
 {
-    if(GTK_CHECK_VERSION(3,10,0)){
-        self->builder=gtk_builder_new_from_file(UI_MPANEL);
-    }else{
+//    if(GTK_CHECK_VERSION(3,10,0)){
+//        self->builder=gtk_builder_new_from_file(UI_MPANEL);
+//    }else{
     self->builder=gtk_builder_new();
     gtk_builder_add_from_file(self->builder,UI_MPANEL,NULL);
-    }
+//    }
 }
 
 void cc_mpanel_class_init(CCMPanelClass * klass)

@@ -16,7 +16,7 @@ OBJS=cclient.o cc-manager-applet.o cc-loging-win.o cc-manager-panel.o \
 
 
 all:${OBJS}
-	${CC} ${CFLAGS} ${LIBS} $^ -o ${BINARY}
+	${CC} ${CFLAGS}  $^ -o ${BINARY} ${LIBS}
 
 
 cclient.o:cclient.c config.h

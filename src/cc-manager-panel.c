@@ -193,7 +193,8 @@ static void mpanel_but_nm_cb(GtkWidget * widget, gpointer data)
 {
     g_message("Open Network-Connection-Editor..");
     GError *err=NULL;
-    gboolean rt=g_spawn_command_line_sync("nm-connection-editor",NULL,NULL,NULL,&err);
+//    gboolean rt=g_spawn_command_line_sync("nm-connection-editor",NULL,NULL,NULL,&err);
+    gboolean rt=g_spawn_command_line_async("nm-connection-editor",&err);
     if(!rt){
         g_warning("nm-connection-edit terminated with Error!!");
     }
@@ -202,7 +203,8 @@ static void mpanel_but_nt_cb(GtkWidget * widget, gpointer data)
 {
     g_message("Open Gnome-nettool..");
     GError *err=NULL;
-    gboolean rt=g_spawn_command_line_sync("gnome-nettool",NULL,NULL,NULL,&err);
+//    gboolean rt=g_spawn_command_line_sync("gnome-nettool",NULL,NULL,NULL,&err);
+    gboolean rt=g_spawn_command_line_async("gnome-nettool",&err);
     if(!rt){
         g_warning("gnome-nettool terminated with Error!!");
     }

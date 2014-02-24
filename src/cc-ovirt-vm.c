@@ -542,7 +542,13 @@ static void cb_stat_vm_child_watch(GPid pid, gint status, CCOvirtVM * ovm)
 
 	g_source_remove(ovm->timeout_id);
     set_infolabel(ovm,"");
-    set_statusbar(ovm,"操作成功");
+    if(vm_stating_cnt < STATING_TIMEOUT_MAX)
+    {set_statusbar(ovm,"操作成功");
+    }else{
+        gchar* ss=g_strdup_printf("操作失败[状态:%s],",sout);
+        set_statusbar(ovm,ss);
+        g_free(ss);
+    }
 
 	GtkWidget *viewer = ovm->win->winers->but_view;	// data->combo_domain;
 
